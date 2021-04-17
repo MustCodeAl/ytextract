@@ -4,7 +4,7 @@
 //!
 //! ```rust
 //! # #[async_std::main] async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = youtube_extractor::Client::new().await?;
+//! let client = ytextract::Client::new().await?;
 //!
 //! let video = client.video("nI2e-J6fsuk".parse()?).await?;
 //!
@@ -34,7 +34,7 @@ static YTCFG_EXP: Lazy<Regex> = Lazy::new(|| Regex::new(r"\nytcfg.set\((\{.*\})\
 ///
 /// ```rust
 /// # #[async_std::main] async fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// let client = youtube_extractor::Client::new().await?;
+/// let client = ytextract::Client::new().await?;
 ///
 /// let video = client.video("nI2e-J6fsuk".parse()?).await?;
 /// # Ok(())
