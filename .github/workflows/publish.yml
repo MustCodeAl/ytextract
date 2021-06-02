@@ -33,7 +33,7 @@ jobs:
           go-version: "^1.15.7"
       - name: Setup | Release notes
         run: |
-          GO111MODULE=on go get github.com/git-chglog/git-chglog/cmd/git-chglog@0.14.2
+          GO111MODULE=on go get -u github.com/git-chglog/git-chglog/cmd/git-chglog
           git-chglog -c .github/chglog/release.yml -o RELEASE.md $(git describe --tags)
       - name: Build | Publish
         uses: softprops/action-gh-release@v1
