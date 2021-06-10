@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        rust: [nightly] # Stable currently does not work. Wait for 1.52.0
+        rust: [nightly, stable]
     steps:
       - name: Setup | Checkout
         uses: actions/checkout@v2.3.4
