@@ -1,0 +1,17 @@
+@video_id = L_VmQZtLVIQ
+
+POST {{base}}/player?key={{key}}
+Content-Type: application/json
+
+{
+	"context": {
+		"client": {
+			"hl": "en",
+			"gl": "US",
+			"clientName": "WEB",
+			"clientVersion": "2.20210622.10.00"
+		}
+    },
+    "video_id": "{{video_id}}"
+}
+

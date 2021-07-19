@@ -1,0 +1,9 @@
+@video_id = EV_3IEBVRss
+
+GET https://youtube.com/get_video_info
+    ?video_id={{video_id}}
+    &el=embedded
+    &hl=en
+    &html5=1
+    &c=TVHTML5
+    &cver=6.20180913

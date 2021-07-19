@@ -1,0 +1,36 @@
+@playlist_id = PLCSusC_jlo14_7xep5gastSaLmqDeS2cZ
+
+POST {{base}}/browse?key={{key}}
+Content-Type: application/json
+
+{
+	"context": {
+		"client": {
+			"hl": "en",
+			"gl": "US",
+			"clientName": "WEB",
+			"clientVersion": "2.20210622.10.00"
+		}
+    },
+    "browse_id": "VL{{playlist_id}}"
+}
+
+### Continuation
+
+@continuation = 4qmFsgJhEiRWTFBMQ1N1c0NfamxvMTRfN3hlcDVnYXN0U2FMbXFEZVMyY1oaFENBRjZCbEJVT2tOSVJjSUdBZ2dBmgIiUExDU3VzQ19qbG8xNF83eGVwNWdhc3RTYUxtcURlUzJjWg%3D%3D
+
+POST {{base}}/browse?key={{key}}
+Content-Type: application/json
+
+{
+	"context": {
+		"client": {
+			"hl": "en",
+			"gl": "US",
+			"clientName": "WEB",
+			"clientVersion": "2.20210622.10.00"
+		}
+    },
+    "continuation": "{{continuation}}"
+}
+

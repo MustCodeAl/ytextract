@@ -1,0 +1,112 @@
+@channel_id = UCiGm_E4ZwYSHV3bcW1pnSeQ
+
+### About
+
+POST {{base}}/browse?key={{key}}
+Content-Type: application/json
+
+{
+	"context": {
+		"client": {
+			"hl": "en",
+			"gl": "US",
+			"clientName": "WEB",
+			"clientVersion": "2.20210701.07.00"
+		}
+	},
+	"browseId": "{{channel_id}}",
+	"params": "EgVhYm91dA%3D%3D"
+}
+
+### Videos
+
+POST {{base}}/browse?key={{key}}
+Content-Type: application/json
+
+{
+	"context": {
+		"client": {
+			"hl": "en",
+			"gl": "US",
+			"clientName": "WEB",
+			"clientVersion": "2.20210701.07.00"
+		}
+	},
+	"browseId": "{{channel_id}}",
+	"params": "EgZ2aWRlb3M%3D"
+}
+
+### Playlists
+
+POST {{base}}/browse?key={{key}}
+Content-Type: application/json
+
+{
+	"context": {
+		"client": {
+			"hl": "en",
+			"gl": "US",
+			"clientName": "WEB",
+			"clientVersion": "2.20210701.07.00"
+		}
+	},
+	"browseId": "{{channel_id}}",
+	"params": "EglwbGF5bGlzdHM%3D"
+}
+
+### Channels
+
+POST {{base}}/browse?key={{key}}
+Content-Type: application/json
+
+{
+	"context": {
+		"client": {
+			"hl": "en",
+			"gl": "US",
+			"clientName": "WEB",
+			"clientVersion": "2.20210701.07.00"
+		}
+	},
+	"browseId": "{{channel_id}}",
+	"params": "EghjaGFubmVscw%3D%3D"
+}
+
+### Community
+
+POST {{base}}/browse?key={{key}}
+Content-Type: application/json
+
+{
+	"context": {
+		"client": {
+			"hl": "en",
+			"gl": "US",
+			"clientName": "WEB",
+			"clientVersion": "2.20210701.07.00"
+		}
+	},
+	"browseId": "{{channel_id}}",
+	"params": "Egljb21tdW5pdHk%3D"
+}
+
+
+### Store
+
+POST {{base}}/browse?key={{key}}
+Content-Type: application/json
+
+{
+	"context": {
+		"client": {
+			"hl": "en",
+			"gl": "US",
+			"clientName": "WEB",
+			"clientVersion": "2.20210701.07.00"
+		}
+	},
+	"browseId": "{{channel_id}}",
+	"params": "EgVzdG9yZQ%3D%3D"
+}
+
+
