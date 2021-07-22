@@ -28,7 +28,6 @@ define_test!(high_quality_streams, "V5Fsj_sCKdg");
 define_test!(dash_manifest, "AI7ULzgf8RU");
 define_test!(vr, "-xNN-bJQ4vI");
 define_test!(hdr, "vX2vsvdq8nw");
-define_test!(age_restricted, "SkRSXFQerZs");
 define_test!(rating_disabled, "5VGm0dczmHc");
 define_test!(subtitles, "YltHGKX80Y8");
 
@@ -37,5 +36,4 @@ mod embed_restricted {
 
     define_test!(youtube, "_kmeFXjjGfk");
     define_test!(author, "MeJVWBSsPAY");
-    define_test!(age_restricted, "hySoCSoH-g8");
 }

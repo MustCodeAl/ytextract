@@ -39,20 +39,7 @@ pub(crate) async fn get(
     let streaming_data = if let Some(streaming_data) = streaming_data {
         streaming_data
     } else {
-        let response = match client.api.player(id).await.unwrap().into_std() {
-            Ok(response) if response.is_streamable() => response.streaming_data,
-            _ => Some(
-                client
-                    .api
-                    .get_video_info(id)
-                    .await
-                    .unwrap()
-                    .into_std()
-                    .unwrap(),
-            ),
-        };
-
-        response.expect("Recoverable error did not contain streaming data")
+        client.api.streams(id).await?.into_std()?
     };
 
     let needs_player = streaming_data

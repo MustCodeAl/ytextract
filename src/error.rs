@@ -56,6 +56,11 @@ pub enum Youtube {
     /// - The playlist is a "Mix" or "My Mix" playlist
     #[error("a playlist could not be viewed")]
     Unviewable,
+
+    /// A [`Video`](crate::Video) is age-restricted and its
+    /// [`Streams`](crate::Stream) could not be fetched.
+    #[error("a video is age-restricted")]
+    AgeRestricted,
 }
 
 /// The Error produced when a invalid Id is found

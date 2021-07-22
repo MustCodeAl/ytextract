@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use once_cell::sync::Lazy;
 use reqwest::IntoUrl;
 use serde::Serialize;
@@ -87,6 +85,25 @@ impl Api {
             .await?)
     }
 
+    pub async fn streams(
+        &self,
+        id: crate::video::Id,
+    ) -> crate::Result<player_response::StreamResult> {
+        #[derive(Debug, Serialize)]
+        #[serde(rename_all = "camelCase")]
+        struct Request<'a> {
+            context: &'a serde_json::Value,
+            video_id: crate::video::Id,
+        }
+
+        let request = Request {
+            context: &CONTEXT,
+            video_id: id,
+        };
+
+        self.get(format!("{}/player", BASE_URL), request).await
+    }
+
     pub async fn player(&self, id: crate::video::Id) -> crate::Result<player_response::Result> {
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
@@ -167,47 +184,5 @@ impl Api {
         };
 
         self.get(format!("{}/browse", BASE_URL), request).await
-    }
-
-    pub async fn get_video_info(
-        &self,
-        id: crate::video::Id,
-    ) -> crate::Result<player_response::StreamResult> {
-        static URL: &str = "https://youtube.com/get_video_info";
-
-        #[derive(Serialize, Debug)]
-        struct Query<'a> {
-            video_id: crate::video::Id,
-            el: &'a str,
-            hl: &'a str,
-            html5: usize,
-            c: &'a str,
-            cver: &'a str,
-        }
-
-        let query = Query {
-            video_id: id,
-            el: "embedded",
-            hl: "en",
-            html5: 1,
-            c: "TVHTML5",
-            cver: "6.20180913",
-        };
-
-        let response = self
-            .http
-            .get(URL)
-            .query(&query)
-            .send()
-            .await?
-            .error_for_status()?
-            .text()
-            .await?;
-
-        Ok(serde_json::from_str(
-            &serde_urlencoded::from_str::<HashMap<String, String>>(&response)
-                .expect("VideoInfo response was invalid urlencoded")["player_response"],
-        )
-        .expect("get_video_info player_response was invalid json"))
     }
 }

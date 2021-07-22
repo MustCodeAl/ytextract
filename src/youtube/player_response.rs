@@ -58,12 +58,6 @@ pub struct PlayerResponse {
     pub playability_status: PlayabilityStatus,
 }
 
-impl PlayerResponse {
-    pub fn is_streamable(&self) -> bool {
-        self.playability_status.status == "OK"
-    }
-}
-
 #[serde_with::serde_as]
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -243,6 +237,7 @@ impl PlayabilityStatus {
             "This video has been removed for violating YouTube's Community Guidelines." => {
                 Youtube::CommunityGuidelineViolation
             }
+            "Sign in to confirm your age" => Youtube::AgeRestricted,
             e => unimplemented!("Unknown error screen text: '{}'", e),
         }
     }
