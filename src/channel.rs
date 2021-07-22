@@ -133,8 +133,7 @@ impl Channel {
     /// The amount of subscribers this channel has.
     pub fn subscribers(&self) -> u64 {
         parse_amount(
-            &self
-                .header()
+            self.header()
                 .subscriber_count_text
                 .simple_text
                 .split_once(' ')
