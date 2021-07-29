@@ -36,8 +36,7 @@ impl Contents {
             .0
             .playlist_video_list_renderer
             .as_ref()
-            .map(|pl| pl.contents.iter())
-            .unwrap_or_else(|| [].iter())
+            .map_or_else(|| [].iter(), |pl| pl.contents.iter())
     }
 }
 
@@ -263,16 +262,14 @@ pub struct ViewsStats {
 
 impl ViewsStats {
     pub fn as_number(&self) -> u64 {
-        match self.simple_text.as_str() {
-            "No views" => 0,
-            o => o
-                .split_once(' ')
-                .expect("No space in ViewsStats text")
-                .0
-                .replace(',', "")
-                .parse()
-                .expect("VideoStats text was not a number"),
-        }
+        self.simple_text
+            .as_str()
+            .split_once(' ')
+            .expect("No space in ViewsStats text")
+            .0
+            .replace(',', "")
+            .parse()
+            .unwrap_or_default()
     }
 }
 
