@@ -1,6 +1,6 @@
 [package]
 name = "ytextract"
-version = "0.6.0"
+version = "0.6.1"
 edition = "2018"
 description = "A Rust library for extracting various information from YouTube pages"
 readme = "README.md"
