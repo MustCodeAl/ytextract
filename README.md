@@ -38,6 +38,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+More examples can be found here: [examples](https://github.com/ATiltedTree/ytextract/tree/main/examples)
+
 ## Notes
 
 - ### Compiler support
