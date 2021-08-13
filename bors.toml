@@ -1,2 +1,4 @@
-status = ["Format", "Check", "Documentation", "Test", "Coverage"]
+status = ["Format", "Check", "Documentation", "Test"]
+# Make sure codecov reports good coverage
+pr_status = ["codecov/patch"]
 delete_merged_branches = true
