@@ -142,8 +142,12 @@ impl Channel {
     }
 
     /// The uploads of a channel in a [`Playlist`](crate::Playlist)
-    pub async fn uploads(&self) -> crate::Result<crate::Playlist> {
-        self.client.playlist(self.id().uploads()).await
+    pub async fn uploads(
+        &self,
+    ) -> crate::Result<
+        impl futures_core::Stream<Item = Result<crate::playlist::Video, crate::playlist::video::Error>>,
+    > {
+        Ok(self.client.playlist(self.id().uploads()).await?.videos())
     }
 
     // TODO: Playlist
