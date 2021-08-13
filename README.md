@@ -4,7 +4,6 @@
 [![Crates.io](https://img.shields.io/crates/v/ytextract?style=for-the-badge&logo=rust)](https://crates.io/crates/ytextract)
 [![docs.rs](https://img.shields.io/docsrs/ytextract?color=teal&style=for-the-badge)](https://docs.rs/ytextract)
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ATiltedTree/ytextract/Test?style=for-the-badge)](https://github.com/ATiltedTree/ytextract/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/ATiltedTree/ytextract/branch/main/graph/badge.svg?token=6CFXYPTNV7)](https://codecov.io/gh/ATiltedTree/ytextract)
 
 ---
 
