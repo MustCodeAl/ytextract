@@ -1,9 +1,6 @@
 name: Main
 on:
   pull_request:
-    paths-ignore:
-      - docs/
-      - \*.md
   push:
     branches:
       - staging
@@ -86,17 +83,6 @@ jobs:
         uses: Swatinem/rust-cache@v1
       - name: Build | Test
         run: cargo test --all-features
-  bors:
-    name: Bors
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && success()
-    needs:
-      - test
-      - check
-      - format
-      - doc
-    steps:
-      - run: exit 0
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
