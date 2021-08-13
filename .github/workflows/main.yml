@@ -6,7 +6,8 @@ on:
       - \*.md
   push:
     branches:
-      - main
+      - staging
+      - trying
 
 jobs:
   format:

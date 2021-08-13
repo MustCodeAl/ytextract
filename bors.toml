@@ -1,0 +1,2 @@
+status = ["Format", "Check", "Documentation", "Test", "Coverage"]
+delete_merged_branches = true
