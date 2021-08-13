@@ -3,7 +3,7 @@ use reqwest::IntoUrl;
 use serde::Serialize;
 
 use crate::youtube::{
-    player_response,
+    browse, player_response,
     tv_config::{Config, TvConfig},
 };
 
@@ -186,10 +186,10 @@ impl Api {
         self.get(format!("{}/browse", BASE_URL), request).await
     }
 
-    pub async fn continuation<T: serde::de::DeserializeOwned>(
+    pub async fn continuation(
         &self,
         continuation: impl AsRef<str>,
-    ) -> crate::Result<T> {
+    ) -> crate::Result<browse::continuation::Root> {
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Request<'a> {
