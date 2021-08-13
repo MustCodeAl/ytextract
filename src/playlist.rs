@@ -141,23 +141,24 @@ impl Playlist {
     }
 
     /// The [`Videos`](Video) of a playlist.
-    pub fn videos(&self) -> impl futures_core::Stream<Item = Result<Video, video::Error>> + '_ {
+    pub fn videos(&self) -> impl futures_core::Stream<Item = Result<Video, video::Error>> {
+        let contents = self.response.contents.clone();
+        let client = Arc::clone(&self.client);
         async_stream::stream! {
             let mut videos: Box<dyn Iterator<Item = browse::playlist::PlaylistItem>> =
-                Box::new(self.response.contents.videos().cloned());
+                Box::new(contents.into_videos());
 
             while let Some(video) = videos.next() {
                 match video {
                     browse::playlist::PlaylistItem::PlaylistVideoRenderer(video) => {
-                        yield Video::new(Arc::clone(&self.client), video);
+                        yield Video::new(Arc::clone(&client), video);
                     }
                     browse::playlist::PlaylistItem::ContinuationItemRenderer(continuation) => {
                         assert!(
                             videos.next().is_none(),
                             "Found a continuation in the middle of videos!"
                         );
-                        let response: browse::continuation::Root = self
-                            .client
+                        let response = client
                             .api
                             .continuation(continuation.get())
                             .await

@@ -22,7 +22,7 @@ pub struct Contents {
 }
 
 impl Contents {
-    pub fn videos(&self) -> impl Iterator<Item = &PlaylistItem> {
+    pub fn into_videos(self) -> impl Iterator<Item = PlaylistItem> {
         self.two_column_browse_results_renderer
             .tabs
             .0
@@ -35,8 +35,8 @@ impl Contents {
             .contents
             .0
             .playlist_video_list_renderer
-            .as_ref()
-            .map_or_else(|| [].iter(), |pl| pl.contents.iter())
+            .contents
+            .into_iter()
     }
 }
 
@@ -85,10 +85,11 @@ pub struct ItemSectionRenderer {
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Content3 {
-    pub playlist_video_list_renderer: Option<PlaylistVideoListRenderer>,
+    #[serde(default)]
+    pub playlist_video_list_renderer: PlaylistVideoListRenderer,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct PlaylistVideoListRenderer {
     pub contents: Vec<PlaylistItem>,
