@@ -15,18 +15,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Get its uploads
     let uploads = channel.uploads().await?;
 
-    // Print it
-    println!("Uploads: {:#?}", uploads);
-
-    // Get the videos from the uploads playlist
-    let videos = uploads.videos();
-
-    futures::pin_mut!(videos);
+    futures::pin_mut!(uploads);
 
     // Print them
-    println!("Videos: [");
+    println!("Uploads: [");
 
-    while let Some(item) = videos.next().await {
+    while let Some(item) = uploads.next().await {
         match item {
             Ok(video) => println!("{:#?},", video),
             Err(err) => println!("{:#?},", err),
