@@ -158,7 +158,7 @@ impl Playlist {
                             videos.next().is_none(),
                             "Found a continuation in the middle of videos!"
                         );
-                        let response = client
+                        let response: browse::continuation::Root = client
                             .api
                             .continuation(continuation.get())
                             .await

@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use crate::{
     youtube::{
-        browse,
+        self, browse,
         innertube::{Browse, ChannelPage},
     },
     Client,
@@ -39,7 +39,7 @@ pub enum Badge {
 }
 
 impl Badge {
-    pub(crate) fn from(badge: &browse::channel::Badge) -> Self {
+    pub(crate) fn from(badge: &youtube::Badge) -> Self {
         match badge.metadata_badge_renderer.style.as_str() {
             "BADGE_STYLE_TYPE_VERIFIED_ARTIST" => Self::VerifiedArtist,
             "BADGE_STYLE_TYPE_VERIFIED" => Self::Verified,

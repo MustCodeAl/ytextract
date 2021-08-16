@@ -51,7 +51,7 @@ impl Video {
             browse::playlist::PlaylistVideoRenderer::Ok(video) => Ok(Self { client, video }),
             browse::playlist::PlaylistVideoRenderer::Err { title, video_id } => Err(Error {
                 id: video_id,
-                reason: UnavailabilityReason::from_title(title.runs.0.text),
+                reason: UnavailabilityReason::from_title(&title.runs[0].text),
             }),
         }
     }
@@ -63,7 +63,7 @@ impl Video {
 
     /// The title of a video.
     pub fn title(&self) -> &str {
-        &self.video.title.runs.0.text
+        &self.video.title.runs[0].text
     }
 
     /// The length of a video.
@@ -78,7 +78,7 @@ impl Video {
 
     /// The author of a video.
     pub fn channel(&self) -> super::Channel<'_> {
-        let short = &self.video.short_byline_text.runs.0;
+        let short = &self.video.short_byline_text.runs[0];
         super::Channel {
             client: Arc::clone(&self.client),
             id: short.navigation_endpoint.browse_endpoint.browse_id,
