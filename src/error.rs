@@ -84,12 +84,6 @@ pub enum Youtube {
     },
 }
 
-impl Youtube {
-    pub(crate) fn is_streamable(&self) -> bool {
-        matches!(self, &Self::AgeRestricted)
-    }
-}
-
 /// The Error produced when a invalid Id is found
 #[derive(thiserror::Error, Debug, Clone)]
 pub enum Id<const N: usize> {
