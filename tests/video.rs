@@ -53,6 +53,8 @@ async fn get() -> Result<(), Box<dyn std::error::Error>> {
     let channel = video.channel();
     assert_eq!(channel.id(), "UCXuqSBlHAE6Xw-yeJA0Tunw".parse()?);
     assert_eq!(channel.name(), "Linus Tech Tips");
+    assert!(channel.subscribers() >= Some(13_800_000));
+    assert!(channel.thumbnails().next().is_some());
     assert_eq!(channel.id(), channel.upgrade().await?.id());
     assert!(!video.description().is_empty());
     assert!(video.views() >= 1_068_917);
@@ -78,6 +80,7 @@ async fn get() -> Result<(), Box<dyn std::error::Error>> {
         video.upload_date(),
         chrono::NaiveDate::from_ymd(2021, 4, 14)
     );
+    assert!(video.hashtags().next().is_none());
 
     let mut streams = video.streams().await?;
     assert!(streams.next().is_some());

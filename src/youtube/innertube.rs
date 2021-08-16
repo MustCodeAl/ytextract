@@ -61,6 +61,11 @@ pub enum Browse {
     Continuation(String),
 }
 
+pub enum Next {
+    Video(crate::video::Id),
+    Continuation(String),
+}
+
 pub struct Api {
     pub(crate) config: Config,
     pub(crate) http: reqwest::Client,
@@ -178,16 +183,31 @@ impl Api {
         self.get("player", request, CONTEXT).await
     }
 
-    pub async fn next(&self, id: crate::video::Id) -> crate::Result<serde_json::Value> {
-        #[derive(Debug, Serialize)]
-        #[serde(rename_all = "camelCase")]
-        struct Request {
-            video_id: crate::video::Id,
+    pub async fn next<T: serde::de::DeserializeOwned>(&self, next: Next) -> crate::Result<T> {
+        match next {
+            Next::Video(video_id) => {
+                #[derive(Debug, Serialize)]
+                #[serde(rename_all = "camelCase")]
+                struct Request {
+                    video_id: crate::video::Id,
+                }
+
+                let request = Request { video_id };
+
+                self.get("next", request, CONTEXT).await
+            }
+            Next::Continuation(continuation) => {
+                #[derive(Debug, Serialize)]
+                #[serde(rename_all = "camelCase")]
+                struct Request {
+                    continuation: String,
+                }
+
+                let request = Request { continuation };
+
+                self.get("next", request, CONTEXT).await
+            }
         }
-
-        let request = Request { video_id: id };
-
-        self.get("next", request, CONTEXT).await
     }
 
     pub async fn browse<T: serde::de::DeserializeOwned>(&self, browse: Browse) -> crate::Result<T> {
