@@ -158,9 +158,9 @@ impl Playlist {
                             videos.next().is_none(),
                             "Found a continuation in the middle of videos!"
                         );
-                        let response: browse::continuation::Root = client
+                        let response: browse::playlist::Continuation = client
                             .api
-                            .continuation(continuation.get())
+                            .browse(Browse::Continuation(continuation.get()))
                             .await
                             .expect("Continuation request failed");
                         videos = Box::new(response.into_videos());

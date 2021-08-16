@@ -2,7 +2,6 @@ use super::Text;
 use serde::Deserialize;
 
 pub mod channel;
-pub mod continuation;
 pub mod playlist;
 
 #[derive(Debug, Deserialize)]
