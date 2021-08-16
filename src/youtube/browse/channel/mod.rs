@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::youtube::parse_subscribers;
+use crate::youtube::{parse_subscribers, Badge, Thumbnails};
 
 pub mod about;
 
@@ -61,12 +61,6 @@ impl C4TabbedHeaderRenderer {
     }
 }
 
-#[derive(Debug, Deserialize, Default, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnails {
-    pub thumbnails: Vec<crate::Thumbnail>,
-}
-
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata {
@@ -111,16 +105,4 @@ pub enum Tab<T> {
 #[serde(rename_all = "camelCase")]
 pub struct TabRenderer<T> {
     pub content: T,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Badge {
-    pub metadata_badge_renderer: MetadataBadgeRenderer,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct MetadataBadgeRenderer {
-    pub style: String,
 }

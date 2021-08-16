@@ -1,3 +1,4 @@
+use super::Text;
 use serde::Deserialize;
 
 pub mod channel;
@@ -48,32 +49,7 @@ impl AlertRenderer {
     fn text(&self) -> &str {
         match &self.text {
             Text::SimpleText(simple_text) => simple_text.simple_text.as_str(),
-            Text::Runs(runs) => runs.runs.0.text.as_str(),
+            Text::Runs(runs) => runs.runs[0].text.as_str(),
         }
     }
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase", untagged)]
-pub enum Text {
-    SimpleText(SimpleText),
-    Runs(Runs),
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SimpleText {
-    pub simple_text: String,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Runs {
-    pub runs: (TitleRun,),
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct TitleRun {
-    pub text: String,
 }

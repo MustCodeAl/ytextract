@@ -3,6 +3,8 @@ use std::time::Duration;
 use serde::Deserialize;
 use serde_with::serde_as;
 
+use crate::youtube::{ChannelNameRuns, ContinuationItemRenderer, Runs, Thumbnails, TitleRun};
+
 pub type Result = super::Result<Ok>;
 
 #[derive(Debug, Deserialize, Clone)]
@@ -102,37 +104,13 @@ pub enum PlaylistItem {
     ContinuationItemRenderer(ContinuationItemRenderer),
 }
 
-#[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ContinuationItemRenderer {
-    pub continuation_endpoint: ContinuationEndpoint,
-}
-
-impl ContinuationItemRenderer {
-    pub fn get(&self) -> &str {
-        &self.continuation_endpoint.continuation_command.token
-    }
-}
-
-#[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ContinuationEndpoint {
-    pub continuation_command: ContinuationCommand,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ContinuationCommand {
-    pub token: String,
-}
-
 #[serde_as]
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum PlaylistVideoRenderer {
     Ok(PlaylistVideo),
     Err {
-        title: Runs<TitleRun>,
+        title: Runs,
         #[serde(rename = "videoId")]
         video_id: crate::video::Id,
     },
@@ -145,42 +123,11 @@ pub struct PlaylistVideo {
     pub video_id: crate::video::Id,
 
     pub thumbnail: Thumbnails,
-    pub title: Runs<TitleRun>,
-    pub short_byline_text: Runs<BylineRun>,
+    pub title: Runs,
+    pub short_byline_text: ChannelNameRuns,
 
     #[serde_as(as = "serde_with::DurationSeconds<String>")]
     pub length_seconds: Duration,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Runs<T: Clone> {
-    pub runs: (T,),
-}
-
-#[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct TitleRun {
-    pub text: String,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct BylineRun {
-    pub text: String,
-    pub navigation_endpoint: NavigationEndpoint,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct NavigationEndpoint {
-    pub browse_endpoint: BrowseEndpoint,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowseEndpoint {
-    pub browse_id: crate::channel::Id,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,13 +146,6 @@ pub struct MicroformatDataRenderer {
     pub thumbnail: Thumbnails,
     pub unlisted: bool,
 }
-////////////////////////////////////////////////////////////////////////////////
-#[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumbnails {
-    pub thumbnails: Vec<crate::Thumbnail>,
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 #[derive(Debug, Deserialize, Clone)]
@@ -301,18 +241,16 @@ pub struct VideoOwner {
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct VideoOwnerRenderer {
-    pub title: Runs<BylineRun>,
+    pub title: ChannelNameRuns,
 }
 
 impl VideoOwnerRenderer {
     pub fn name(&self) -> &str {
-        &self.title.runs.0.text
+        &self.title.runs[0].text
     }
 
     pub fn id(&self) -> crate::channel::Id {
-        self.title
-            .runs
-            .0
+        self.title.runs[0]
             .navigation_endpoint
             .browse_endpoint
             .browse_id
