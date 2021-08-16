@@ -21,15 +21,12 @@ async fn get() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(channel.id(), channel.upgrade().await?.id());
     assert!(playlist.unlisted());
     assert!(!playlist.thumbnails().is_empty());
-    #[allow(clippy::absurd_extreme_comparisons)]
-    #[allow(unused_comparisons)]
-    let views = playlist.views() >= 0;
-    assert!(views);
-    assert_eq!(playlist.length(), 121);
+    assert!(playlist.views() >= 4);
+    assert_eq!(playlist.length(), 122);
 
     let videos: Vec<_> = playlist.videos().collect().await;
 
-    assert_eq!(videos.len(), 121);
+    assert_eq!(videos.len(), 122);
 
     Ok(())
 }
