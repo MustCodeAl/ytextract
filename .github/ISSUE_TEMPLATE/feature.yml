@@ -1,0 +1,24 @@
+name: Feature Request
+description: Request a feature
+labels:
+  - enhancement
+body:
+  - type: dropdown
+    attributes:
+      label: What area does this feature request cover?
+      options:
+        - Video
+        - Playlist
+        - Channel
+        - Streams
+        - Other
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: If this request is in the "Other" category, on what YouTube can the requested information be found?
+  - type: textarea
+    attributes:
+      label: Please describe your request.
+    validations:
+      required: true
