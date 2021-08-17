@@ -1,0 +1,16 @@
+POST {{BASE}}/next
+Content-Type: application/json
+X-Goog-Api-Key: {{KEY}}
+
+{
+	"context": {
+		"client": {
+			"hl": "en",
+			"gl": "US",
+			"clientName": "WEB",
+			"clientVersion": "2.20210622.10.00"
+		}
+    },
+    "video_id": "p3dDcKOFXQg"
+}
+
