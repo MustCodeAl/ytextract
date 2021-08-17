@@ -76,6 +76,7 @@ pub struct VideoPrimaryInfoRenderer {
     pub sentiment_bar: Option<SentimentBar>,
     #[serde(default)]
     pub super_title_link: SuperTitleLink,
+    pub date_text: SimpleText,
 }
 
 impl VideoPrimaryInfoRenderer {

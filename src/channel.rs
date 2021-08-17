@@ -1,7 +1,5 @@
 //! Channel types.
 
-use std::sync::Arc;
-
 use crate::{
     youtube::{
         self, browse,
@@ -51,12 +49,12 @@ impl Badge {
 /// A Channel
 #[derive(Clone)]
 pub struct Channel {
-    client: Arc<Client>,
+    client: Client,
     response: browse::channel::about::Root,
 }
 
 impl Channel {
-    pub(crate) async fn get(client: Arc<Client>, id: Id) -> crate::Result<Self> {
+    pub(crate) async fn get(client: Client, id: Id) -> crate::Result<Self> {
         let response: browse::channel::about::Result = client
             .api
             .browse(Browse::Channel {
@@ -67,10 +65,7 @@ impl Channel {
 
         let response = response.into_std()?;
 
-        Ok(Self {
-            client: Arc::clone(&client),
-            response,
-        })
+        Ok(Self { client, response })
     }
 
     fn contents(&self) -> &browse::channel::about::ChannelAboutFullMetadataRenderer {

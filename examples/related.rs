@@ -2,7 +2,7 @@ use futures::StreamExt;
 
 #[async_std::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = ytextract::Client::new().await?;
+    let client = ytextract::Client::new();
 
     let id = std::env::args().nth(1).expect("No video id provided");
     let amount = std::env::args().nth(2).expect("No amount provided");

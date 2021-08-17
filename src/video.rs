@@ -11,7 +11,7 @@
 //!
 //! ```rust
 //! # #[async_std::main] async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = ytextract::Client::new().await?;
+//! let client = ytextract::Client::new();
 //!
 //! let video = client.video("nI2e-J6fsuk".parse()?).await?;
 //!
@@ -23,30 +23,28 @@
 pub mod related;
 
 use crate::{
-    youtube::{innertube::Next, next, player_response::PlayerResponse},
+    youtube::{innertube::Next, next, parse_date, player_response::PlayerResponse},
     Client, Stream, Thumbnail,
 };
 
-use std::{sync::Arc, time::Duration};
+use std::time::Duration;
 
 /// A Video.
 ///
 /// For more information see the [crate level documentation](crate::video)
 #[derive(Clone)]
 pub struct Video {
-    initial_data: next::Root,
     player_response: PlayerResponse,
-    client: Arc<Client>,
+    initial_data: next::Root,
+    client: Client,
 }
 
 impl Video {
-    pub(crate) async fn get(client: Arc<Client>, id: Id) -> crate::Result<Self> {
-        let player_response = client.api.player(id).await?.into_std()?;
-
+    pub(crate) async fn get(client: Client, id: Id) -> crate::Result<Self> {
         Ok(Self {
+            player_response: client.api.player(id).await?.into_std()?,
             initial_data: client.api.next(Next::Video(id)).await?,
             client,
-            player_response,
         })
     }
 
@@ -82,7 +80,7 @@ impl Video {
             .owner
             .video_owner_renderer;
         Channel {
-            client: Arc::clone(&self.client),
+            client: &self.client,
             id: self.player_response.video_details.channel_id,
             name: &self.player_response.video_details.author,
             subscribers: owner.subscribers(),
@@ -139,33 +137,19 @@ impl Video {
         &self.player_response.video_details.thumbnail.thumbnails
     }
 
-    /// If a [`Video`] is age-restricted.
-    pub fn age_restricted(&self) -> bool {
-        !self.microformat().is_family_safe
-    }
-
-    fn microformat(&self) -> &crate::youtube::player_response::PlayerMicroformatRenderer {
-        &self.player_response.microformat.player_microformat_renderer
-    }
-
-    /// If a [`Video`] is unlisted.
-    pub fn unlisted(&self) -> bool {
-        self.microformat().is_unlisted
-    }
-
-    /// The category a [`Video`] belongs in.
-    pub fn category(&self) -> &str {
-        &self.microformat().category
-    }
-
     /// The date a [`Video`] was published.
-    pub fn publish_date(&self) -> chrono::NaiveDate {
-        self.microformat().publish_date
-    }
-
-    /// The date a [`Video`] was uploaded.
-    pub fn upload_date(&self) -> chrono::NaiveDate {
-        self.microformat().upload_date
+    pub fn date(&self) -> chrono::NaiveDate {
+        parse_date(
+            &self
+                .initial_data
+                .contents
+                .two_column_watch_next_results
+                .results
+                .results
+                .primary()
+                .date_text,
+        )
+        .expect("Unable to parse date")
     }
 
     /// The [`Items`](Related) related to a [`Video`].
@@ -178,7 +162,7 @@ impl Video {
             .secondary_results
             .results
             .clone();
-        let client = Arc::clone(&self.client);
+        let client = self.client.clone();
 
         async_stream::stream! {
             let mut items: Box<dyn Iterator<Item = next::RelatedItem>> =
@@ -200,16 +184,16 @@ impl Video {
                         items = Box::new(response.into_videos());
                     }
                     next::RelatedItem::CompactVideoRenderer(video) => {
-                        yield Related::Video(related::Video(video, Arc::clone(&client)));
+                        yield Related::Video(related::Video(video, client.clone()));
                     }
                     next::RelatedItem::CompactPlaylistRenderer(playlist) => {
-                        yield Related::Playlist(related::Playlist(playlist, Arc::clone(&client)));
+                        yield Related::Playlist(related::Playlist(playlist, client.clone()));
                     }
                     next::RelatedItem::CompactRadioRenderer(radio) => {
-                        yield Related::Radio(related::Radio(radio, Arc::clone(&client)));
+                        yield Related::Radio(related::Radio(radio, client.clone()));
                     }
                     next::RelatedItem::CompactMovieRenderer(movie) => {
-                        yield Related::Movie(related::Movie(movie, Arc::clone(&client)));
+                        yield Related::Movie(related::Movie(movie, client.clone()));
                     },
                     // I don't know what this is - just skip it
                     next::RelatedItem::PromotedSparklesWebRenderer {} => continue,
@@ -220,12 +204,7 @@ impl Video {
 
     /// The [`Streams`](Stream) of a [`Video`]
     pub async fn streams(&self) -> crate::Result<impl Iterator<Item = Stream>> {
-        crate::stream::get(
-            Arc::clone(&self.client),
-            self.id(),
-            self.player_response.streaming_data.clone(),
-        )
-        .await
+        crate::stream::get(self.client.clone(), self.id()).await
     }
 }
 
@@ -242,11 +221,7 @@ impl std::fmt::Debug for Video {
             .field("ratings", &self.ratings())
             .field("live", &self.live())
             .field("thumbnails", &self.thumbnails())
-            .field("age_restricted", &self.age_restricted())
-            .field("unlisted", &self.unlisted())
-            .field("category", &self.category())
-            .field("publish_date", &self.publish_date())
-            .field("upload_date", &self.upload_date())
+            .field("date", &self.date())
             .finish()
     }
 }
@@ -261,7 +236,7 @@ impl Eq for Video {}
 
 /// The uploader of a video
 pub struct Channel<'a> {
-    client: Arc<Client>,
+    client: &'a Client,
     id: crate::channel::Id,
     name: &'a str,
     subscribers: Option<u64>,

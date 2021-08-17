@@ -12,7 +12,6 @@ pub(crate) mod id;
 pub mod channel;
 mod client;
 pub mod error;
-pub(crate) mod player;
 pub mod playlist;
 pub mod stream;
 mod thumbnail;

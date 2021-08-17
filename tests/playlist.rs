@@ -1,10 +1,7 @@
-use std::sync::Arc;
-
 use futures::StreamExt;
 use once_cell::sync::Lazy;
 
-static CLIENT: Lazy<Arc<ytextract::Client>> =
-    Lazy::new(|| async_std::task::block_on(ytextract::Client::new()).unwrap());
+static CLIENT: Lazy<ytextract::Client> = Lazy::new(|| ytextract::Client::new());
 
 #[async_std::test]
 async fn get() -> Result<(), Box<dyn std::error::Error>> {

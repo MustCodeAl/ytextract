@@ -1,9 +1,6 @@
-use std::sync::Arc;
-
 use once_cell::sync::Lazy;
 
-static CLIENT: Lazy<Arc<ytextract::Client>> =
-    Lazy::new(|| async_std::task::block_on(ytextract::Client::new()).unwrap());
+static CLIENT: Lazy<ytextract::Client> = Lazy::new(|| ytextract::Client::new());
 
 macro_rules! define_test {
     ($fn:ident, $id:literal, $($attr:meta)?) => {

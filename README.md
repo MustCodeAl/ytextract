@@ -25,7 +25,7 @@ This includes:
 #[async_std::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Get a Client for making request
-    let client = ytextract::Client::new().await?;
+    let client = ytextract::Client::new();
 
     // Get information about the Video identified by the id "nI2e-J6fsuk".
     let video = client.video("nI2e-J6fsuk".parse()?).await?;

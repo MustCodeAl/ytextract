@@ -1,7 +1,5 @@
 //! Playlist videos
 
-use std::sync::Arc;
-
 use crate::{youtube::browse, Client, Thumbnail};
 
 /// The reason as to why a [`Video`] is unavailable
@@ -38,13 +36,13 @@ pub struct Error {
 /// A Video of a [`Playlist`](super::Playlist).
 #[derive(Clone)]
 pub struct Video {
-    client: Arc<Client>,
+    client: Client,
     video: browse::playlist::PlaylistVideo,
 }
 
 impl Video {
     pub(super) fn new(
-        client: Arc<Client>,
+        client: Client,
         video: browse::playlist::PlaylistVideoRenderer,
     ) -> Result<Self, Error> {
         match video {
@@ -80,7 +78,7 @@ impl Video {
     pub fn channel(&self) -> super::Channel<'_> {
         let short = &self.video.short_byline_text.runs[0];
         super::Channel {
-            client: Arc::clone(&self.client),
+            client: &self.client,
             id: short.navigation_endpoint.browse_endpoint.browse_id,
             name: &short.text,
         }
