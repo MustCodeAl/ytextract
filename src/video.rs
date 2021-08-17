@@ -20,6 +20,8 @@
 //! # }
 //! ```
 
+pub mod related;
+
 use crate::{
     youtube::{innertube::Next, next, player_response::PlayerResponse},
     Client, Stream, Thumbnail,
@@ -166,6 +168,56 @@ impl Video {
         self.microformat().upload_date
     }
 
+    /// The [`Items`](Related) related to a [`Video`].
+    pub fn related(&self) -> impl futures_core::Stream<Item = Related> {
+        let initial_items = self
+            .initial_data
+            .contents
+            .two_column_watch_next_results
+            .secondary_results
+            .secondary_results
+            .results
+            .clone();
+        let client = Arc::clone(&self.client);
+
+        async_stream::stream! {
+            let mut items: Box<dyn Iterator<Item = next::RelatedItem>> =
+                Box::new(initial_items.into_iter());
+
+            while let Some(item) = items.next() {
+                match item {
+                    next::RelatedItem::ContinuationItemRenderer(continuation) => {
+                        assert!(
+                            items.next().is_none(),
+                            "Found a continuation in the middle of items!"
+                        );
+                        let response: next::Continuation = client
+                            .api
+                            .next(Next::Continuation(continuation.get()))
+                            .await
+                            .expect("Continuation request failed");
+
+                        items = Box::new(response.into_videos());
+                    }
+                    next::RelatedItem::CompactVideoRenderer(video) => {
+                        yield Related::Video(related::Video(video, Arc::clone(&client)));
+                    }
+                    next::RelatedItem::CompactPlaylistRenderer(playlist) => {
+                        yield Related::Playlist(related::Playlist(playlist, Arc::clone(&client)));
+                    }
+                    next::RelatedItem::CompactRadioRenderer(radio) => {
+                        yield Related::Radio(related::Radio(radio, Arc::clone(&client)));
+                    }
+                    next::RelatedItem::CompactMovieRenderer(movie) => {
+                        yield Related::Movie(related::Movie(movie, Arc::clone(&client)));
+                    },
+                    // I don't know what this is - just skip it
+                    next::RelatedItem::PromotedSparklesWebRenderer {} => continue,
+                }
+            }
+        }
+    }
+
     /// The [`Streams`](Stream) of a [`Video`]
     pub async fn streams(&self) -> crate::Result<impl Iterator<Item = Stream>> {
         crate::stream::get(
@@ -285,4 +337,20 @@ define_id! {
         "https://youtu.be/",
         "https://www.youtube.com/embed/",
     ]
+}
+
+/// A Item that is related to a [`Video`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Related {
+    /// A Video
+    Video(related::Video),
+
+    /// A Playlist
+    Playlist(related::Playlist),
+
+    /// A Movie
+    Movie(related::Movie),
+
+    /// A Radio
+    Radio(related::Radio),
 }
