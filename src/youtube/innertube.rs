@@ -1,17 +1,12 @@
 use serde::Serialize;
 
-use crate::youtube::{
-    player_response,
-    tv_config::{Config, TvConfig},
-};
+use crate::youtube::player_response;
 
 const DUMP: bool = false;
-
 const BASE_URL: &str = "https://youtubei.googleapis.com/youtubei/v1";
+const API_KEY: &str = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
 
-const TV_CONFIG_URL: &str = "https://www.youtube.com/tv_config?action_get_config=true";
-
-const CONTEXT: Context<'static> = Context {
+const CONTEXT_WEB: Context<'static> = Context {
     client: Client {
         hl: "en",
         gl: "US",
@@ -21,13 +16,23 @@ const CONTEXT: Context<'static> = Context {
     },
 };
 
-const CONTEXT_EMBEDDED: Context<'static> = Context {
+const CONTEXT_ANDROID: Context<'static> = Context {
     client: Client {
         hl: "en",
         gl: "US",
-        client_name: "WEB",
+        client_name: "ANDROID",
+        client_screen: None,
+        client_version: "16.05",
+    },
+};
+
+const CONTEXT_ANDROID_EMBEDDED: Context<'static> = Context {
+    client: Client {
+        hl: "en",
+        gl: "US",
+        client_name: "ANDROID",
         client_screen: Some("EMBED"),
-        client_version: "2.20210622.10.0",
+        client_version: "16.05",
     },
 };
 
@@ -66,35 +71,16 @@ pub enum Next {
     Continuation(String),
 }
 
+#[derive(Clone)]
 pub struct Api {
-    pub(crate) config: Config,
     pub(crate) http: reqwest::Client,
 }
 
 impl Api {
-    pub async fn new() -> crate::Result<Self> {
-        let http = reqwest::Client::new();
-        let tv_config = http
-            .get(TV_CONFIG_URL)
-            .send()
-            .await?
-            .error_for_status()?
-            .text()
-            .await?;
-        let tv_config = tv_config
-            .lines()
-            .nth(1)
-            .expect("tv_config did not have a second line");
-
-        let tv_config: TvConfig =
-            serde_json::from_str(tv_config).expect("tv_config was invalid json");
-
-        Ok(Self {
-            config: tv_config
-                .web_player_context_config
-                .web_player_context_config_id_living_room_watch,
-            http,
-        })
+    pub fn new() -> Self {
+        Self {
+            http: reqwest::Client::new(),
+        }
     }
 
     async fn get<T: serde::de::DeserializeOwned, R: Serialize>(
@@ -115,7 +101,7 @@ impl Api {
         let response = self
             .http
             .post(format!("{}/{}", BASE_URL, endpoint))
-            .header("X-Goog-Api-Key", &self.config.innertube_api_key)
+            .header("X-Goog-Api-Key", API_KEY)
             .json(&request)
             .send()
             .await?
@@ -124,6 +110,7 @@ impl Api {
             .await?;
 
         if DUMP {
+            let _ = std::fs::create_dir(endpoint);
             use std::time::SystemTime;
             let time = SystemTime::now()
                 .duration_since(SystemTime::UNIX_EPOCH)
@@ -159,13 +146,14 @@ impl Api {
 
         let request = Request { video_id: id };
 
-        let res: player_response::StreamResult = self.get("player", request, CONTEXT).await?;
+        let res: player_response::StreamResult =
+            self.get("player", request, CONTEXT_ANDROID).await?;
 
         match res.into_std() {
             Ok(streaming_data) => Ok(player_response::StreamResult::Ok { streaming_data }),
             Err(crate::Error::Youtube(crate::error::Youtube::AgeRestricted)) => {
                 let request = Request { video_id: id };
-                self.get("player", request, CONTEXT_EMBEDDED).await
+                self.get("player", request, CONTEXT_ANDROID_EMBEDDED).await
             }
             Err(err) => Err(err),
         }
@@ -180,7 +168,7 @@ impl Api {
 
         let request = Request { video_id: id };
 
-        self.get("player", request, CONTEXT).await
+        self.get("player", request, CONTEXT_ANDROID).await
     }
 
     pub async fn next<T: serde::de::DeserializeOwned>(&self, next: Next) -> crate::Result<T> {
@@ -194,7 +182,7 @@ impl Api {
 
                 let request = Request { video_id };
 
-                self.get("next", request, CONTEXT).await
+                self.get("next", request, CONTEXT_WEB).await
             }
             Next::Continuation(continuation) => {
                 #[derive(Debug, Serialize)]
@@ -205,7 +193,7 @@ impl Api {
 
                 let request = Request { continuation };
 
-                self.get("next", request, CONTEXT).await
+                self.get("next", request, CONTEXT_WEB).await
             }
         }
     }
@@ -239,10 +227,10 @@ impl Api {
 
                 let request = Request { continuation };
 
-                return self.get("browse", request, CONTEXT).await;
+                return self.get("browse", request, CONTEXT_WEB).await;
             }
         };
 
-        self.get("browse", request, CONTEXT).await
+        self.get("browse", request, CONTEXT_WEB).await
     }
 }

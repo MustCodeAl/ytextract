@@ -1,64 +1,40 @@
-use once_cell::sync::OnceCell;
-
 use crate::{
-    channel, player::Player, playlist, stream, video, youtube::innertube::Api, Channel, Playlist,
-    Stream, Video,
+    channel, playlist, stream, video, youtube::innertube::Api, Channel, Playlist, Stream, Video,
 };
 
-use std::sync::Arc;
-
 /// A Client capable of interacting with YouTube
+///
+/// Note: This structure already uses an [`Arc`](std::sync::Arc) internally, so
+///       it does not need to be wrapped again.
 #[allow(missing_debug_implementations)]
+#[derive(Clone)]
 pub struct Client {
-    pub(crate) player: OnceCell<Player>,
     pub(crate) api: Api,
 }
 
 impl Client {
     /// Create a new [`Client`]
-    pub async fn new() -> crate::Result<Arc<Self>> {
-        Ok(Arc::new(Self {
-            player: OnceCell::new(),
-            api: Api::new().await?,
-        }))
-    }
-
-    pub(crate) async fn init_player(&self) {
-        if self.player.get().is_none() {
-            let player = Player::from_url(&self.api.http, self.api.config.js_url())
-                .await
-                .expect("Unable to parse player");
-
-            if self.player.set(player).is_err() {
-                log::warn!("Reinitialized player. Oh well...");
-            }
-        }
-    }
-
-    pub(crate) fn player(&self) -> &Player {
-        self.player.get().expect("Player not initialized!")
+    pub fn new() -> Self {
+        Self { api: Api::new() }
     }
 
     /// Get a [`Video`] identified by a [`Id`](video::Id)
-    pub async fn video(self: &Arc<Self>, id: video::Id) -> crate::Result<Video> {
-        Video::get(Arc::clone(self), id).await
+    pub async fn video(&self, id: video::Id) -> crate::Result<Video> {
+        Video::get(self.clone(), id).await
     }
 
     /// Get the [`Stream`]s of a [`Video`] identified by a [`Id`](video::Id)
-    pub async fn streams(
-        self: &Arc<Self>,
-        id: video::Id,
-    ) -> crate::Result<impl Iterator<Item = Stream>> {
-        stream::get(Arc::clone(self), id, None).await
+    pub async fn streams(&self, id: video::Id) -> crate::Result<impl Iterator<Item = Stream>> {
+        stream::get(self.clone(), id).await
     }
 
     /// Get a [`Playlist`] identified by a [`Id`](playlist::Id)
-    pub async fn playlist(self: &Arc<Self>, id: playlist::Id) -> crate::Result<Playlist> {
-        Playlist::get(Arc::clone(self), id).await
+    pub async fn playlist(&self, id: playlist::Id) -> crate::Result<Playlist> {
+        Playlist::get(self.clone(), id).await
     }
 
     /// Get a [`Channel`] identified by a [`Id`](channel::Id)
-    pub async fn channel(self: &Arc<Self>, id: channel::Id) -> crate::Result<Channel> {
-        Channel::get(Arc::clone(self), id).await
+    pub async fn channel(&self, id: channel::Id) -> crate::Result<Channel> {
+        Channel::get(self.clone(), id).await
     }
 }

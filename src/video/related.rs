@@ -8,14 +8,11 @@ use crate::youtube::{
     parse_length,
 };
 
-use std::{fmt::Debug, sync::Arc};
+use std::fmt::Debug;
 
 /// A related Video
 #[derive(Clone)]
-pub struct Video(
-    pub(super) CompactVideoRenderer,
-    pub(super) Arc<crate::Client>,
-);
+pub struct Video(pub(super) CompactVideoRenderer, pub(super) crate::Client);
 
 impl Video {
     /// The [`Id`](super::Id) of this video.
@@ -65,7 +62,7 @@ impl Video {
                 .browse_id,
             name: &self.0.short_byline_text.runs[0].text,
             badges: &self.0.owner_badges,
-            client: Arc::clone(&self.1),
+            client: &self.1,
         }
     }
 
@@ -103,10 +100,7 @@ impl Eq for Video {}
 
 /// A related Playlist
 #[derive(Clone)]
-pub struct Playlist(
-    pub(super) CompactPlaylistRenderer,
-    pub(super) Arc<crate::Client>,
-);
+pub struct Playlist(pub(super) CompactPlaylistRenderer, pub(super) crate::Client);
 
 impl Playlist {
     /// The [`Id`](crate::playlist::Id) of this playlist.
@@ -124,11 +118,6 @@ impl Playlist {
         self.0.thumbnail.thumbnails.iter()
     }
 
-    /// The amount of videos in this playlist.
-    pub fn length(&self) -> u64 {
-        todo!()
-    }
-
     /// The [`Channel`] that uploaded this playlist.
     pub fn channel(&self) -> Channel<'_> {
         Channel {
@@ -138,7 +127,7 @@ impl Playlist {
                 .browse_id,
             name: &self.0.short_byline_text.runs[0].text,
             badges: &self.0.owner_badges,
-            client: Arc::clone(&self.1),
+            client: &self.1,
         }
     }
 
@@ -154,7 +143,6 @@ impl Debug for Playlist {
             .field("id", &self.id())
             .field("title", &self.title())
             .field("thumbnails", &self.thumbnails().collect::<Vec<_>>())
-            .field("length", &self.length())
             .field("channel", &self.channel())
             .finish()
     }
@@ -170,10 +158,7 @@ impl Eq for Playlist {}
 
 /// A related Radio
 #[derive(Clone)]
-pub struct Radio(
-    pub(super) CompactRadioRenderer,
-    pub(super) Arc<crate::Client>,
-);
+pub struct Radio(pub(super) CompactRadioRenderer, pub(super) crate::Client);
 
 impl Radio {
     /// The [`Id`](crate::playlist::Id) of this radio.
@@ -217,10 +202,7 @@ impl Eq for Radio {}
 
 /// A related Movie
 #[derive(Clone)]
-pub struct Movie(
-    pub(super) CompactMovieRenderer,
-    pub(super) Arc<crate::Client>,
-);
+pub struct Movie(pub(super) CompactMovieRenderer, pub(super) crate::Client);
 
 impl Movie {
     /// The [`Id`](super::Id) of this movie.
@@ -274,7 +256,7 @@ pub struct Channel<'a> {
     id: crate::channel::Id,
     name: &'a str,
     badges: &'a Vec<youtube::Badge>,
-    client: Arc<crate::Client>,
+    client: &'a crate::Client,
 }
 
 impl<'a> Channel<'a> {

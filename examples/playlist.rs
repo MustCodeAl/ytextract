@@ -2,7 +2,7 @@ use futures::StreamExt;
 
 #[async_std::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = ytextract::Client::new().await?;
+    let client = ytextract::Client::new();
 
     let id = std::env::args().nth(1).expect("No playlist id provided");
 

@@ -4,8 +4,6 @@ pub mod video;
 
 pub use self::video::Video;
 
-use std::sync::Arc;
-
 use crate::{
     youtube::{
         browse::{
@@ -54,12 +52,12 @@ impl std::fmt::Display for Id {
 /// A Playlist.
 #[derive(Clone)]
 pub struct Playlist {
-    client: Arc<Client>,
+    client: Client,
     response: browse::playlist::Ok,
 }
 
 impl Playlist {
-    pub(crate) async fn get(client: Arc<crate::Client>, id: Id) -> crate::Result<Self> {
+    pub(crate) async fn get(client: crate::Client, id: Id) -> crate::Result<Self> {
         let response: browse::playlist::Result = client.api.browse(Browse::Playlist(id)).await?;
         let response = response.into_std()?;
 
@@ -114,7 +112,7 @@ impl Playlist {
     pub fn channel(&self) -> Option<Channel<'_>> {
         let sec = &self.secondary_sidebar()?.video_owner.video_owner_renderer;
         Some(Channel {
-            client: Arc::clone(&self.client),
+            client: &self.client,
             id: sec.id(),
             name: sec.name(),
         })
@@ -143,7 +141,7 @@ impl Playlist {
     /// The [`Videos`](Video) of a playlist.
     pub fn videos(&self) -> impl futures_core::Stream<Item = Result<Video, video::Error>> {
         let contents = self.response.contents.clone();
-        let client = Arc::clone(&self.client);
+        let client = self.client.clone();
         async_stream::stream! {
             let mut videos: Box<dyn Iterator<Item = browse::playlist::PlaylistItem>> =
                 Box::new(contents.into_videos());
@@ -151,7 +149,7 @@ impl Playlist {
             while let Some(video) = videos.next() {
                 match video {
                     browse::playlist::PlaylistItem::PlaylistVideoRenderer(video) => {
-                        yield Video::new(Arc::clone(&client), video);
+                        yield Video::new(client.clone(), video);
                     }
                     browse::playlist::PlaylistItem::ContinuationItemRenderer(continuation) => {
                         assert!(
@@ -193,7 +191,7 @@ impl Eq for Playlist {}
 /// The creator of a [`Playlist`]
 #[derive(Clone)]
 pub struct Channel<'a> {
-    client: Arc<Client>,
+    client: &'a Client,
     id: crate::channel::Id,
     name: &'a str,
 }

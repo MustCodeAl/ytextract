@@ -4,7 +4,7 @@ use serde::Deserialize;
 pub mod channel;
 pub mod playlist;
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum Result<T> {
     Error { alerts: (Alert,) },
@@ -32,13 +32,13 @@ impl<T> Result<T> {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Alert {
     pub alert_renderer: AlertRenderer,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 pub struct AlertRenderer {
     pub r#type: String,
     pub text: Text,

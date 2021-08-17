@@ -1,11 +1,8 @@
-use std::sync::Arc;
-
 use futures::StreamExt;
 use once_cell::sync::Lazy;
 use ytextract::video::Ratings;
 
-static CLIENT: Lazy<Arc<ytextract::Client>> =
-    Lazy::new(|| async_std::task::block_on(ytextract::Client::new()).unwrap());
+static CLIENT: Lazy<ytextract::Client> = Lazy::new(|| ytextract::Client::new());
 
 #[async_std::test]
 async fn get() -> Result<(), Box<dyn std::error::Error>> {
@@ -70,17 +67,7 @@ async fn get() -> Result<(), Box<dyn std::error::Error>> {
 
     assert!(!video.live());
     assert!(!video.thumbnails().is_empty());
-    assert!(!video.age_restricted());
-    assert!(!video.unlisted());
-    assert_eq!(video.category(), "Science & Technology");
-    assert_eq!(
-        video.publish_date(),
-        chrono::NaiveDate::from_ymd(2021, 4, 14)
-    );
-    assert_eq!(
-        video.upload_date(),
-        chrono::NaiveDate::from_ymd(2021, 4, 14)
-    );
+    assert_eq!(video.date(), chrono::NaiveDate::from_ymd(2021, 4, 14));
     assert!(video.hashtags().next().is_none());
 
     let mut streams = video.streams().await?;

@@ -6,20 +6,19 @@ use crate::{
 use chrono::{DateTime, Utc};
 use reqwest::Url;
 
-use std::{sync::Arc, time::Duration};
+use std::time::Duration;
 
 /// A [`Stream`](super::Stream) containing video or audio data.
 #[derive(Clone)]
 pub struct Stream {
     pub(super) format: CommonFormat,
-    pub(super) client: Arc<Client>,
-    pub(super) url: Url,
+    pub(super) client: Client,
 }
 
 impl Stream {
     /// The [`Url`] of a [`Stream`]
     pub fn url(&self) -> Url {
-        self.url.clone()
+        self.format.url.clone()
     }
 
     /// The length of a [`Stream`] in bytes
@@ -84,7 +83,7 @@ impl Stream {
 
     pub(super) fn debug(&self, debug: &mut std::fmt::DebugStruct<'_, '_>) {
         debug
-            .field("url", &self.url)
+            .field("url", &self.url())
             .field("quality", &self.quality())
             .field("mime_type", &self.mime_type())
             .field("last_modified", &self.last_modified())

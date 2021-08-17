@@ -6,41 +6,40 @@ pub mod browse;
 pub mod innertube;
 pub mod next;
 pub mod player_response;
-pub mod tv_config;
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ChannelNameRuns {
     pub runs: Vec<ChannelNameRun>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ChannelNameRun {
     pub text: String,
     pub navigation_endpoint: NavigationEndpoint,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct NavigationEndpoint {
     pub browse_endpoint: BrowseEndpoint,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct BrowseEndpoint {
     pub browse_id: crate::channel::Id,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum Text {
     SimpleText(SimpleText),
     Runs(Runs),
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct SimpleText {
     pub simple_text: String,
@@ -54,37 +53,37 @@ impl Deref for SimpleText {
     }
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Runs {
     pub runs: Vec<TitleRun>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct TitleRun {
     pub text: String,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Badge {
     pub metadata_badge_renderer: MetadataBadgeRenderer,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct MetadataBadgeRenderer {
     pub style: String,
 }
 
-#[derive(Debug, Deserialize, Clone, Default)]
+#[derive(Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Thumbnails {
     pub thumbnails: Vec<crate::Thumbnail>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ContinuationItemRenderer {
     pub continuation_endpoint: ContinuationEndpoint,
@@ -99,13 +98,13 @@ impl ContinuationItemRenderer {
     }
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ContinuationEndpoint {
     pub continuation_command: ContinuationCommand,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ContinuationCommand {
     pub token: String,
@@ -135,4 +134,9 @@ pub fn parse_length(value: &str) -> std::time::Duration {
         let mul = 60u64.pow(i as u32);
         acc + (s * mul)
     }))
+}
+
+/// Parse a video upload data in the format `<MONTH_NAME> <DAY>, <YEAR>`
+pub fn parse_date(value: &str) -> Option<chrono::NaiveDate> {
+    chrono::NaiveDate::parse_from_str(value, "%b %e, %Y").ok()
 }

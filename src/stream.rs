@@ -4,7 +4,7 @@
 //!
 //! ```rust
 //! # #[async_std::main] async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let client = ytextract::Client::new().await?;
+//! let client = ytextract::Client::new();
 //!
 //! let streams = client.streams("nI2e-J6fsuk".parse()?).await?;
 //!
@@ -24,38 +24,19 @@ pub use self::audio::Stream as Audio;
 pub use self::common::Stream as Common;
 pub use self::video::Stream as Video;
 pub use crate::youtube::player_response::Quality;
-use crate::{
-    youtube::player_response::{FormatType, StreamingData},
-    Client,
-};
-use reqwest::Url;
-use std::sync::Arc;
+use crate::{youtube::player_response::FormatType, Client};
 
 pub(crate) async fn get(
-    client: Arc<Client>,
+    client: Client,
     id: crate::video::Id,
-    streaming_data: Option<StreamingData>,
 ) -> crate::Result<impl Iterator<Item = Stream>> {
-    let streaming_data = if let Some(streaming_data) = streaming_data {
-        streaming_data
-    } else {
-        client.api.streams(id).await?.into_std()?
-    };
-
-    let needs_player = streaming_data
-        .adaptive_formats
-        .iter()
-        .any(|f| f.base.url.is_none());
-
-    if needs_player {
-        client.init_player().await;
-    }
+    let streaming_data = client.api.streams(id).await?.into_std()?;
 
     // TODO: DashManifest/HlsManifest
     Ok(streaming_data
         .adaptive_formats
         .into_iter()
-        .map(move |stream| Stream::new(stream, Arc::clone(&client))))
+        .map(move |stream| Stream::new(stream, client.clone())))
 }
 
 /// A Stream of a YouTube video
@@ -68,14 +49,10 @@ pub enum Stream {
 }
 
 impl Stream {
-    pub(crate) fn new(
-        format: crate::youtube::player_response::Format,
-        client: Arc<Client>,
-    ) -> Self {
+    pub(crate) fn new(format: crate::youtube::player_response::Format, client: Client) -> Self {
         match format.ty {
             FormatType::Audio(audio) => Self::Audio(Audio {
                 common: Common {
-                    url: Self::resolve_url(&client, &format.base),
                     format: format.base,
                     client,
                 },
@@ -83,42 +60,11 @@ impl Stream {
             }),
             FormatType::Video(video) => Self::Video(Video {
                 common: Common {
-                    url: Self::resolve_url(&client, &format.base),
                     format: format.base,
                     client,
                 },
                 video,
             }),
-        }
-    }
-
-    fn resolve_url(
-        client: &Arc<Client>,
-        format: &crate::youtube::player_response::CommonFormat,
-    ) -> Url {
-        match &format.url {
-            Some(url) => url.clone(),
-            None => {
-                let signature_cipher = format
-                    .signature_cipher
-                    .as_ref()
-                    .expect("Stream did not have a URL or signatureCipher");
-
-                #[derive(serde::Deserialize)]
-                struct SignatureCipher<'a> {
-                    s: String,
-                    sp: &'a str,
-                    url: String,
-                }
-
-                let mut root: SignatureCipher<'_> =
-                    serde_urlencoded::from_str(signature_cipher.as_str())
-                        .expect("signatureCipher was not urlencoded");
-
-                let signature = client.player().cipher().run(root.s);
-                root.url.push_str(&format!("&{}={}", root.sp, signature));
-                Url::parse(&root.url).expect("signatureCipher url attribute was not a valid URL")
-            }
         }
     }
 
