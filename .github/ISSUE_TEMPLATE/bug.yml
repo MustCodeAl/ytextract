@@ -1,0 +1,31 @@
+name: Bug Report
+description: File a bug report
+labels:
+  - bug
+body:
+  - type: dropdown
+    attributes:
+      label: What were you trying to fetch?
+      options:
+        - Video
+        - Playlist
+        - Channel
+        - Streams
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What id does the item have that failed to fetch?
+      description: This can be a video, channel or playlist id
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What unexpected error or behavior occurred?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: If possible, add the snippet of code that failed.
+      description: This should be the snippet that panicked or returned a unexpected error.
+      render: rust
