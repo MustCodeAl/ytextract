@@ -20,9 +20,10 @@
 //! # }
 //! ```
 
-use crate::{youtube::player_response::PlayerResponse, Client, Stream, Thumbnail};
-
-use serde_json::Value;
+use crate::{
+    youtube::{innertube::Next, next, player_response::PlayerResponse},
+    Client, Stream, Thumbnail,
+};
 
 use std::{sync::Arc, time::Duration};
 
@@ -31,7 +32,7 @@ use std::{sync::Arc, time::Duration};
 /// For more information see the [crate level documentation](crate::video)
 #[derive(Clone)]
 pub struct Video {
-    initial_data: Value,
+    initial_data: next::Root,
     player_response: PlayerResponse,
     client: Arc<Client>,
 }
@@ -41,7 +42,7 @@ impl Video {
         let player_response = client.api.player(id).await?.into_std()?;
 
         Ok(Self {
-            initial_data: client.api.next(id).await?,
+            initial_data: client.api.next(Next::Video(id)).await?,
             client,
             player_response,
         })
@@ -69,10 +70,21 @@ impl Video {
 
     /// The [`Channel`] of a [`Video`].
     pub fn channel(&self) -> Channel<'_> {
+        let owner = &self
+            .initial_data
+            .contents
+            .two_column_watch_next_results
+            .results
+            .results
+            .secondary()
+            .owner
+            .video_owner_renderer;
         Channel {
             client: Arc::clone(&self.client),
             id: self.player_response.video_details.channel_id,
             name: &self.player_response.video_details.author,
+            subscribers: owner.subscribers(),
+            thumbnails: owner.thumbnails(),
         }
     }
 
@@ -88,33 +100,30 @@ impl Video {
 
     /// The [`Ratings`] a [`Video`] received.
     pub fn ratings(&self) -> Ratings {
-        if self.player_response.video_details.allow_ratings {
-            let fixed_tooltip = self.initial_data["contents"]["twoColumnWatchNextResults"]
-                ["results"]["results"]["contents"]
-                .as_array()
-                .expect("InitialData contents was not an array")
-                .iter()
-                .find_map(|v| v.get("videoPrimaryInfoRenderer"))
-                .expect("InitialData contents did not have a videoPrimaryInfoRenderer")
-                ["sentimentBar"]["sentimentBarRenderer"]["tooltip"]
-                .as_str()
-                .expect("sentimentBar tooltip was not a string")
-                .replace(',', "");
-            let (likes, dislikes) = fixed_tooltip
-                .split_once(" / ")
-                .expect("sentimentBar tooltip did not have a '/'");
-
-            let likes = likes
-                .parse()
-                .expect("Likes we not parsable as a unsigned integer");
-            let dislikes = dislikes
-                .parse()
-                .expect("Dislikes we not parsable as a unsigned integer");
-
+        if let Some((likes, dislikes)) = self
+            .initial_data
+            .contents
+            .two_column_watch_next_results
+            .results
+            .results
+            .primary()
+            .ratings()
+        {
             Ratings::Allowed { likes, dislikes }
         } else {
             Ratings::NotAllowed
         }
+    }
+
+    /// The hashtags a [`Video`] is tagged with.
+    pub fn hashtags(&self) -> impl Iterator<Item = &str> {
+        self.initial_data
+            .contents
+            .two_column_watch_next_results
+            .results
+            .results
+            .primary()
+            .hashtags()
     }
 
     /// If a [`Video`] is live (e.g. a Livestream) or if it was live in the
@@ -203,6 +212,8 @@ pub struct Channel<'a> {
     client: Arc<Client>,
     id: crate::channel::Id,
     name: &'a str,
+    subscribers: Option<u64>,
+    thumbnails: &'a Vec<Thumbnail>,
 }
 
 impl<'a> Channel<'a> {
@@ -216,6 +227,16 @@ impl<'a> Channel<'a> {
         self.name
     }
 
+    /// The amount of subscribers a [`Channel`] has.
+    pub fn subscribers(&self) -> Option<u64> {
+        self.subscribers
+    }
+
+    /// The [`Thumbnails`](Thumbnail) of a [`Channel`]
+    pub fn thumbnails(&self) -> impl Iterator<Item = &Thumbnail> {
+        self.thumbnails.iter()
+    }
+
     /// Refetch the channel to get more information
     pub async fn upgrade(&self) -> crate::Result<crate::Channel> {
         self.client.channel(self.id).await
@@ -227,6 +248,8 @@ impl<'a> std::fmt::Debug for Channel<'a> {
         f.debug_struct("Channel")
             .field("id", &self.id)
             .field("name", &self.name)
+            .field("subscribers", &self.subscribers)
+            .field("thumbnails", &self.thumbnails)
             .finish()
     }
 }
