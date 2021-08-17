@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use futures::StreamExt;
 use once_cell::sync::Lazy;
 use ytextract::video::Ratings;
 
@@ -128,24 +129,28 @@ macro_rules! define_test {
     };
 }
 
-define_test!(normal, "9bZkp7q19f0");
-define_test!(live_stream, "5qap5aO4i9A");
-define_test!(live_stream_recording, "rsAAeyAr-9Y");
-define_test!(high_quality_streams, "V5Fsj_sCKdg");
-define_test!(dash_manifest, "AI7ULzgf8RU");
-define_test!(vr, "-xNN-bJQ4vI");
-define_test!(hdr, "vX2vsvdq8nw");
-define_test!(age_restricted, "SkRSXFQerZs");
-define_test!(rating_disabled, "5VGm0dczmHc");
-define_test!(required_purchase, "p3dDcKOFXQg");
-define_test!(subtitles, "YltHGKX80Y8");
-
-mod embed_restricted {
+mod metadata {
     use super::CLIENT;
 
-    define_test!(youtube, "_kmeFXjjGfk");
-    define_test!(author, "MeJVWBSsPAY");
-    define_test!(age_restricted, "hySoCSoH-g8");
+    define_test!(normal, "9bZkp7q19f0");
+    define_test!(live_stream, "5qap5aO4i9A");
+    define_test!(live_stream_recording, "rsAAeyAr-9Y");
+    define_test!(high_quality_streams, "V5Fsj_sCKdg");
+    define_test!(dash_manifest, "AI7ULzgf8RU");
+    define_test!(vr, "-xNN-bJQ4vI");
+    define_test!(hdr, "vX2vsvdq8nw");
+    define_test!(age_restricted, "SkRSXFQerZs");
+    define_test!(rating_disabled, "5VGm0dczmHc");
+    define_test!(required_purchase, "p3dDcKOFXQg");
+    define_test!(subtitles, "YltHGKX80Y8");
+
+    mod embed_restricted {
+        use super::CLIENT;
+
+        define_test!(youtube, "_kmeFXjjGfk");
+        define_test!(author, "MeJVWBSsPAY");
+        define_test!(age_restricted, "hySoCSoH-g8");
+    }
 }
 
 mod error {
@@ -188,4 +193,15 @@ mod error {
         }
         Ok(())
     }
+}
+
+#[async_std::test]
+async fn related() -> Result<(), Box<dyn std::error::Error>> {
+    let id = "9bZkp7q19f0".parse()?;
+
+    let video = CLIENT.video(id).await?;
+
+    video.related().take(100).collect::<Vec<_>>().await;
+
+    Ok(())
 }

@@ -127,3 +127,12 @@ pub fn parse_subscribers(value: &str) -> Option<u64> {
         Some((val * mul) as u64)
     }
 }
+
+/// Parse a video length in the format `HH:MM:SS`
+pub fn parse_length(value: &str) -> std::time::Duration {
+    std::time::Duration::from_secs(value.split(':').rev().enumerate().fold(0, |acc, (i, s)| {
+        let s: u64 = s.parse().unwrap();
+        let mul = 60u64.pow(i as u32);
+        acc + (s * mul)
+    }))
+}
