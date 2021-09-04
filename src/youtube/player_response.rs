@@ -106,7 +106,6 @@ pub struct Format {
 #[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct CommonFormat {
-    #[serde_as(as = "serde_with::DisplayFromStr")]
     pub url: Url,
     pub quality: Quality,
     pub projection_type: String,
@@ -191,6 +190,8 @@ pub struct PlayabilityStatus {
 impl PlayabilityStatus {
     fn as_error(&self) -> crate::error::Youtube {
         use crate::error::Youtube;
+
+        eprintln!("{}", &self.reason);
 
         match self.reason.as_str() {
             "This video is unavailable." => Youtube::NotFound,
