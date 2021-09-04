@@ -11,7 +11,6 @@ const CONTEXT_WEB: Context<'static> = Context {
         hl: "en",
         gl: "US",
         client_name: "WEB",
-        client_screen: None,
         client_version: "2.20210622.10.0",
     },
 };
@@ -21,17 +20,6 @@ const CONTEXT_ANDROID: Context<'static> = Context {
         hl: "en",
         gl: "US",
         client_name: "ANDROID",
-        client_screen: None,
-        client_version: "16.05",
-    },
-};
-
-const CONTEXT_ANDROID_EMBEDDED: Context<'static> = Context {
-    client: Client {
-        hl: "en",
-        gl: "US",
-        client_name: "ANDROID",
-        client_screen: Some("EMBED"),
         client_version: "16.05",
     },
 };
@@ -48,8 +36,6 @@ struct Client<'a> {
     hl: &'a str,
     gl: &'a str,
     client_name: &'a str,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    client_screen: Option<&'a str>,
     client_version: &'a str,
 }
 
@@ -146,17 +132,7 @@ impl Api {
 
         let request = Request { video_id: id };
 
-        let res: player_response::StreamResult =
-            self.get("player", request, CONTEXT_ANDROID).await?;
-
-        match res.into_std() {
-            Ok(streaming_data) => Ok(player_response::StreamResult::Ok { streaming_data }),
-            Err(crate::Error::Youtube(crate::error::Youtube::AgeRestricted)) => {
-                let request = Request { video_id: id };
-                self.get("player", request, CONTEXT_ANDROID_EMBEDDED).await
-            }
-            Err(err) => Err(err),
-        }
+        self.get("player", request, CONTEXT_ANDROID).await
     }
 
     pub async fn player(&self, id: crate::video::Id) -> crate::Result<player_response::Result> {
