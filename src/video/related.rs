@@ -31,8 +31,8 @@ impl Video {
     }
 
     /// The amount of views this video has.
-    pub fn views(&self) -> u64 {
-        let s: &str = match &self.0.view_count_text {
+    pub fn views(&self) -> Option<u64> {
+        let s: &str = match self.0.view_count_text.as_ref()? {
             // "<VIEWS> views"
             crate::youtube::Text::SimpleText(simple) => {
                 simple
@@ -45,7 +45,7 @@ impl Video {
             crate::youtube::Text::Runs(runs) => &runs.runs[0].text,
         };
 
-        s.replace(',', "").parse().expect("Views were not parsable")
+        Some(s.replace(',', "").parse().expect("Views were not parsable"))
     }
 
     /// The length of this video. [`None`] if this video is a livestream.
