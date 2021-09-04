@@ -26,7 +26,6 @@ define_test!(vr, "-xNN-bJQ4vI");
 define_test!(hdr, "vX2vsvdq8nw");
 define_test!(rating_disabled, "5VGm0dczmHc");
 define_test!(subtitles, "YltHGKX80Y8");
-define_test!(age_restricted, "SkRSXFQerZs");
 
 mod embed_restricted {
     use super::CLIENT;
@@ -61,8 +60,10 @@ mod error {
         NudityOrSexualContentViolation
     );
     define_test!(account_terminated, "Pfhpe6shO2U", AccountTerminated);
-    define_test!(removed_by_uploader, "N3QlpdWUpHo", RemovedByUploader);
+    define_test!(removed_by_uploader, "MwCXB2byk58", RemovedByUploader);
     define_test!(tos_violation, "tJievCeKBs0", TermsOfServiceViolation);
+    define_test!(age_restricted, "SkRSXFQerZs", AgeRestricted);
+
     #[async_std::test]
     async fn copyright_claim() -> Result<(), Box<dyn std::error::Error>> {
         let id = "6MNavkSGntQ".parse()?;

@@ -218,7 +218,7 @@ pub struct CompactVideoRenderer {
     pub title: SimpleText,
     // channel name
     pub short_byline_text: ChannelNameRuns,
-    pub view_count_text: Text,
+    pub view_count_text: Option<Text>,
     pub length_text: Option<SimpleText>,
 
     #[serde(default)]
