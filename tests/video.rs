@@ -130,6 +130,7 @@ mod metadata {
     define_test!(rating_disabled, "5VGm0dczmHc");
     define_test!(required_purchase, "p3dDcKOFXQg");
     define_test!(subtitles, "YltHGKX80Y8");
+    define_test!(premire, "vv-Fqm6Qtj4");
 
     mod embed_restricted {
         use super::CLIENT;
