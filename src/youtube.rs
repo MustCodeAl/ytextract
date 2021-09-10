@@ -136,7 +136,8 @@ pub fn parse_length(value: &str) -> std::time::Duration {
     }))
 }
 
-/// Parse a video upload data in the format `<MONTH_NAME> <DAY>, <YEAR>`
+/// Parse a video upload data in the format `[Premiered ]<MONTH_NAME> <DAY>, <YEAR>`
 pub fn parse_date(value: &str) -> Option<chrono::NaiveDate> {
+    let value = value.strip_prefix("Premiered ").unwrap_or(value);
     chrono::NaiveDate::parse_from_str(value, "%b %e, %Y").ok()
 }
