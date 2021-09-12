@@ -4,42 +4,20 @@ use chrono::{DateTime, Utc};
 use reqwest::Url;
 use serde::Deserialize;
 
+use super::Thumbnails;
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
-pub enum StreamResult {
-    Ok {
-        #[serde(rename = "streamingData")]
-        streaming_data: StreamingData,
-    },
+pub enum Result<T> {
+    Ok(T),
     Error {
         #[serde(rename = "playabilityStatus")]
         playability_status: PlayabilityStatus,
     },
 }
 
-impl StreamResult {
-    pub fn into_std(self) -> crate::Result<StreamingData> {
-        match self {
-            Self::Error { playability_status } => {
-                Err(crate::Error::Youtube(playability_status.as_error()))
-            }
-            Self::Ok { streaming_data } => Ok(streaming_data),
-        }
-    }
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase", untagged)]
-pub enum Result {
-    Ok(PlayerResponse),
-    Error {
-        #[serde(rename = "playabilityStatus")]
-        playability_status: PlayabilityStatus,
-    },
-}
-
-impl Result {
-    pub fn into_std(self) -> crate::Result<PlayerResponse> {
+impl<T> Result<T> {
+    pub fn into_std(self) -> crate::Result<T> {
         match self {
             Self::Error { playability_status } => {
                 Err(crate::Error::Youtube(playability_status.as_error()))
@@ -73,18 +51,15 @@ pub struct VideoDetails {
     #[serde_as(as = "serde_with::DisplayFromStr")]
     pub view_count: u64,
 
-    pub allow_ratings: bool,
-
-    pub is_private: bool,
     pub is_live_content: bool,
 
-    pub thumbnail: Thumbnail,
+    pub thumbnail: Thumbnails,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Thumbnail {
-    pub thumbnails: Vec<crate::Thumbnail>,
+pub struct StreamPlayerResponse {
+    pub streaming_data: StreamingData,
 }
 
 #[derive(Deserialize, Clone)]
@@ -108,7 +83,6 @@ pub struct Format {
 pub struct CommonFormat {
     pub url: Url,
     pub quality: Quality,
-    pub projection_type: String,
     pub mime_type: String,
     #[serde_as(as = "serde_with::TimestampMilliSeconds<String>")]
     pub last_modified: DateTime<Utc>,
@@ -117,13 +91,9 @@ pub struct CommonFormat {
     #[serde(default)]
     pub content_length: Option<u64>,
     pub bitrate: u64,
-    pub average_bitrate: Option<u64>,
     #[serde_as(as = "Option<serde_with::DurationMilliSeconds<String>>")]
     #[serde(default, rename = "approxDurationMs")]
     pub duration: Option<Duration>,
-
-    pub init_range: Option<Range>,
-    pub index_range: Option<Range>,
 }
 
 #[derive(Deserialize, Clone)]
@@ -153,16 +123,6 @@ pub struct AudioFormat {
     pub audio_channels: u64,
 }
 
-#[serde_with::serde_as]
-#[derive(Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Range {
-    #[serde_as(as = "serde_with::DisplayFromStr")]
-    pub start: u64,
-    #[serde_as(as = "serde_with::DisplayFromStr")]
-    pub end: u64,
-}
-
 /// The quality of a Stream
 #[allow(missing_docs)]
 #[derive(Debug, Deserialize, PartialEq, Eq, Clone, Copy, PartialOrd, Ord)]
@@ -183,15 +143,12 @@ pub enum Quality {
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayabilityStatus {
-    pub status: String,
     pub reason: String,
 }
 
 impl PlayabilityStatus {
     fn as_error(&self) -> crate::error::Youtube {
         use crate::error::Youtube;
-
-        eprintln!("{}", &self.reason);
 
         match self.reason.as_str() {
             "This video is unavailable." => Youtube::NotFound,
