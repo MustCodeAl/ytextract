@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::youtube::player_response;
 
-const DUMP: bool = false;
+const DUMP: bool = option_env!("YTEXTRACT_DUMP").is_some();
 const BASE_URL: &str = "https://youtubei.googleapis.com/youtubei/v1";
 const API_KEY: &str = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
 
