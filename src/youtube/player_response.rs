@@ -82,7 +82,6 @@ pub struct Format {
 #[serde(rename_all = "camelCase")]
 pub struct CommonFormat {
     pub url: Url,
-    pub quality: Quality,
     pub mime_type: String,
     #[serde_as(as = "serde_with::TimestampMilliSeconds<String>")]
     pub last_modified: DateTime<Utc>,
@@ -121,23 +120,6 @@ pub struct AudioFormat {
     pub audio_sample_rate: u64,
     pub audio_quality: String,
     pub audio_channels: u64,
-}
-
-/// The quality of a Stream
-#[allow(missing_docs)]
-#[derive(Debug, Deserialize, PartialEq, Eq, Clone, Copy, PartialOrd, Ord)]
-#[serde(rename_all = "lowercase")]
-#[non_exhaustive]
-pub enum Quality {
-    Tiny,
-    Small,
-    Medium,
-    Large,
-
-    HD720,
-    HD1080,
-    HD1440,
-    HD2160,
 }
 
 #[derive(Deserialize)]

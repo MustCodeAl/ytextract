@@ -1,7 +1,4 @@
-use crate::{
-    youtube::player_response::{CommonFormat, Quality},
-    Client,
-};
+use crate::{youtube::player_response::CommonFormat, Client};
 
 use chrono::{DateTime, Utc};
 use reqwest::Url;
@@ -56,11 +53,6 @@ impl Stream {
             .bytes_stream())
     }
 
-    /// The [`Quality`] of a [`Stream`]
-    pub fn quality(&self) -> &Quality {
-        &self.format.quality
-    }
-
     /// The [mime type](https://en.wikipedia.org/wiki/Media_type) of a [`Stream`]
     pub fn mime_type(&self) -> &str {
         &self.format.mime_type
@@ -84,7 +76,6 @@ impl Stream {
     pub(super) fn debug(&self, debug: &mut std::fmt::DebugStruct<'_, '_>) {
         debug
             .field("url", &self.url())
-            .field("quality", &self.quality())
             .field("mime_type", &self.mime_type())
             .field("last_modified", &self.last_modified())
             .field("bitrate", &self.bitrate())

@@ -23,7 +23,6 @@ mod video;
 pub use self::audio::Stream as Audio;
 pub use self::common::Stream as Common;
 pub use self::video::Stream as Video;
-pub use crate::youtube::player_response::Quality;
 use crate::{youtube::player_response::FormatType, Client};
 
 pub(crate) async fn get(
