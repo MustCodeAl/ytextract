@@ -60,7 +60,6 @@ mod error {
         NudityOrSexualContentViolation
     );
     define_test!(account_terminated, "Pfhpe6shO2U", AccountTerminated);
-    define_test!(removed_by_uploader, "MwCXB2byk58", RemovedByUploader);
     define_test!(tos_violation, "tJievCeKBs0", TermsOfServiceViolation);
     define_test!(age_restricted, "SkRSXFQerZs", AgeRestricted);
 
