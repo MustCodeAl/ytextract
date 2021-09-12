@@ -123,7 +123,7 @@ impl Api {
     pub async fn streams(
         &self,
         id: crate::video::Id,
-    ) -> crate::Result<player_response::StreamResult> {
+    ) -> crate::Result<player_response::Result<player_response::StreamPlayerResponse>> {
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Request {
@@ -135,7 +135,10 @@ impl Api {
         self.get("player", request, CONTEXT_ANDROID).await
     }
 
-    pub async fn player(&self, id: crate::video::Id) -> crate::Result<player_response::Result> {
+    pub async fn player(
+        &self,
+        id: crate::video::Id,
+    ) -> crate::Result<player_response::Result<player_response::PlayerResponse>> {
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Request {

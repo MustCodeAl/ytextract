@@ -30,10 +30,11 @@ pub(crate) async fn get(
     client: Client,
     id: crate::video::Id,
 ) -> crate::Result<impl Iterator<Item = Stream>> {
-    let streaming_data = client.api.streams(id).await?.into_std()?;
+    let player_response = client.api.streams(id).await?.into_std()?;
 
     // TODO: DashManifest/HlsManifest
-    Ok(streaming_data
+    Ok(player_response
+        .streaming_data
         .adaptive_formats
         .into_iter()
         .map(move |stream| Stream::new(stream, client.clone())))
