@@ -62,7 +62,7 @@ async fn video() -> Result<(), Box<dyn std::error::Error>> {
     let videos: Vec<_> = playlist.videos().collect().await;
 
     for (i, video) in videos.into_iter().enumerate() {
-        match i {
+        assert_matches::assert_matches!(i,
             0 => {
                 let video = video?;
                 assert_eq!(video.id(), "1_ozXudbN-4".parse()?);
@@ -74,8 +74,7 @@ async fn video() -> Result<(), Box<dyn std::error::Error>> {
                 assert!(video.streams().await?.next().is_some());
                 assert_eq!(video.clone(), video);
             }
-            _ => panic!("Too many videos"),
-        }
+        );
     }
 
     Ok(())
@@ -138,6 +137,7 @@ mod videos {
 }
 
 mod error {
+    use assert_matches::assert_matches;
     use futures::StreamExt;
 
     use super::CLIENT;
@@ -147,11 +147,10 @@ mod error {
             #[async_std::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
-                let playlist = CLIENT.playlist(id).await;
-                match playlist {
-                    Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error)) => {}
-                    err => panic!("{:#?}", err),
-                }
+                assert_matches!(
+                    CLIENT.playlist(id).await,
+                    Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error))
+                );
                 Ok(())
             }
         };
