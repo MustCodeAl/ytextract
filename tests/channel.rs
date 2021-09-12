@@ -104,6 +104,8 @@ mod badges {
 }
 
 mod error {
+    use assert_matches::assert_matches;
+
     use super::CLIENT;
 
     macro_rules! define_test {
@@ -112,10 +114,10 @@ mod error {
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
                 let channel = CLIENT.channel(id).await;
-                assert!(matches!(
+                assert_matches!(
                     channel,
-                    Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error)),
-                ));
+                    Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error))
+                );
                 Ok(())
             }
         };

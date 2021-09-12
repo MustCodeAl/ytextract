@@ -35,6 +35,8 @@ mod embed_restricted {
 }
 
 mod error {
+    use assert_matches::assert_matches;
+
     use super::CLIENT;
 
     macro_rules! define_test {
@@ -42,10 +44,10 @@ mod error {
             #[async_std::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
-                assert!(matches!(
-                    CLIENT.streams(id).await,
-                    Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error)),
-                ));
+                assert_matches!(
+                    CLIENT.streams(id).await.map(|x| x.collect::<Vec<_>>()),
+                    Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error))
+                );
                 Ok(())
             }
         };
@@ -67,13 +69,12 @@ mod error {
     async fn copyright_claim() -> Result<(), Box<dyn std::error::Error>> {
         let id = "6MNavkSGntQ".parse()?;
 
-        match CLIENT.streams(id).await {
-            Ok(_) => panic!("got OK"),
+        assert_matches!(
+            CLIENT.streams(id).await.map(|x| x.collect::<Vec<_>>()),
             Err(ytextract::Error::Youtube(ytextract::error::Youtube::CopyrightClaim {
                 claiment,
-            })) if claiment == "Richard DiBacco" => {}
-            Err(other) => panic!("{:#?}", other),
-        }
+            })) if claiment == "Richard DiBacco"
+        );
         Ok(())
     }
 }

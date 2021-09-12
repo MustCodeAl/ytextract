@@ -104,20 +104,20 @@ async fn ratings_not_allowed() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-macro_rules! define_test {
-    ($fn:ident, $id:literal) => {
-        #[async_std::test]
-        async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
-            let id = $id.parse()?;
-            let video = CLIENT.video(id).await?;
-            assert_eq!(video.id(), id);
-            Ok(())
-        }
-    };
-}
-
 mod metadata {
     use super::CLIENT;
+
+    macro_rules! define_test {
+        ($fn:ident, $id:literal) => {
+            #[async_std::test]
+            async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
+                let id = $id.parse()?;
+                let video = CLIENT.video(id).await?;
+                assert_eq!(video.id(), id);
+                Ok(())
+            }
+        };
+    }
 
     define_test!(normal, "9bZkp7q19f0");
     define_test!(live_stream, "5qap5aO4i9A");
@@ -142,6 +142,8 @@ mod metadata {
 }
 
 mod error {
+    use assert_matches::assert_matches;
+
     use super::CLIENT;
 
     macro_rules! define_test {
@@ -149,10 +151,10 @@ mod error {
             #[async_std::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
-                assert!(matches!(
+                assert_matches!(
                     CLIENT.video(id).await,
-                    Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error)),
-                ));
+                    Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error))
+                );
                 Ok(())
             }
         };
@@ -172,12 +174,12 @@ mod error {
     async fn copyright_claim() -> Result<(), Box<dyn std::error::Error>> {
         let id = "6MNavkSGntQ".parse()?;
 
-        match CLIENT.video(id).await {
+        assert_matches!(
+            CLIENT.video(id).await,
             Err(ytextract::Error::Youtube(ytextract::error::Youtube::CopyrightClaim {
                 claiment,
-            })) if claiment == "Richard DiBacco" => {}
-            other => panic!("{:#?}", other),
-        }
+            })) if claiment == "Richard DiBacco"
+        );
         Ok(())
     }
 }
