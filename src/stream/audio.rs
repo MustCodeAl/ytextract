@@ -36,6 +36,7 @@ impl Stream {
 impl std::fmt::Debug for Stream {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut debug = f.debug_struct("AudioStream");
+        self.common.debug(&mut debug);
         self.debug(&mut debug);
         debug.finish()
     }
