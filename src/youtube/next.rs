@@ -232,7 +232,7 @@ pub struct CompactPlaylistRenderer {
     pub thumbnail: Thumbnails,
     pub title: SimpleText,
     // channel name
-    pub short_byline_text: ChannelNameRuns,
+    pub short_byline_text: super::Runs<OptionalChannelNameRun>,
     // length
     pub video_count_short_text: SimpleText,
 
@@ -255,6 +255,13 @@ pub struct CompactMovieRenderer {
     pub thumbnail: Thumbnails,
     pub title: SimpleText,
     pub length_text: SimpleText,
+}
+
+#[derive(Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct OptionalChannelNameRun {
+    pub text: String,
+    pub navigation_endpoint: Option<super::NavigationEndpoint>,
 }
 
 #[derive(Deserialize)]
