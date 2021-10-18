@@ -56,10 +56,12 @@ impl Video {
     /// The [`Channel`] that uploaded this video.
     pub fn channel(&self) -> Channel<'_> {
         Channel {
-            id: self.0.short_byline_text.runs[0]
-                .navigation_endpoint
-                .browse_endpoint
-                .browse_id,
+            id: Some(
+                self.0.short_byline_text.runs[0]
+                    .navigation_endpoint
+                    .browse_endpoint
+                    .browse_id,
+            ),
             name: &self.0.short_byline_text.runs[0].text,
             badges: &self.0.owner_badges,
             client: &self.1,
@@ -123,8 +125,8 @@ impl Playlist {
         Channel {
             id: self.0.short_byline_text.runs[0]
                 .navigation_endpoint
-                .browse_endpoint
-                .browse_id,
+                .clone()
+                .map(|x| x.browse_endpoint.browse_id),
             name: &self.0.short_byline_text.runs[0].text,
             badges: &self.0.owner_badges,
             client: &self.1,
@@ -253,7 +255,7 @@ impl Eq for Movie {}
 /// The uploader of a [`Related`](super::Related) item
 #[derive(Clone)]
 pub struct Channel<'a> {
-    id: crate::channel::Id,
+    id: Option<crate::channel::Id>,
     name: &'a str,
     badges: &'a Vec<youtube::Badge>,
     client: &'a crate::Client,
@@ -261,7 +263,7 @@ pub struct Channel<'a> {
 
 impl<'a> Channel<'a> {
     /// The [`Id`](crate::channel::Id) of this channel.
-    pub fn id(&self) -> crate::channel::Id {
+    pub fn id(&self) -> Option<crate::channel::Id> {
         self.id
     }
 

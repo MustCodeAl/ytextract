@@ -3,7 +3,7 @@ use std::time::Duration;
 use serde::Deserialize;
 use serde_with::serde_as;
 
-use crate::youtube::{ChannelNameRuns, ContinuationItemRenderer, Runs, Thumbnails, TitleRun};
+use crate::youtube::{ChannelNameRuns, ContinuationItemRenderer, Thumbnails, TitleRun, TitleRuns};
 
 pub type Result = super::Result<Ok>;
 
@@ -110,7 +110,7 @@ pub enum PlaylistItem {
 pub enum PlaylistVideoRenderer {
     Ok(PlaylistVideo),
     Err {
-        title: Runs,
+        title: TitleRuns,
         #[serde(rename = "videoId")]
         video_id: crate::video::Id,
     },
@@ -123,7 +123,7 @@ pub struct PlaylistVideo {
     pub video_id: crate::video::Id,
 
     pub thumbnail: Thumbnails,
-    pub title: Runs,
+    pub title: TitleRuns,
     pub short_byline_text: ChannelNameRuns,
 
     #[serde_as(as = "serde_with::DurationSeconds<String>")]

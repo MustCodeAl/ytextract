@@ -153,18 +153,19 @@ impl Video {
     }
 
     /// The [`Items`](Related) related to a [`Video`].
-    pub fn related(&self) -> impl futures_core::Stream<Item = Related> {
+    pub fn related(&self) -> Option<impl futures_core::Stream<Item = Related>> {
         let initial_items = self
             .initial_data
             .contents
             .two_column_watch_next_results
             .secondary_results
+            .as_ref()?
             .secondary_results
             .results
             .clone();
         let client = self.client.clone();
 
-        async_stream::stream! {
+        Some(async_stream::stream! {
             let mut items: Box<dyn Iterator<Item = next::RelatedItem> + Send + Sync> =
                 Box::new(initial_items.into_iter());
 
@@ -199,7 +200,7 @@ impl Video {
                     next::RelatedItem::PromotedSparklesWebRenderer {} => continue,
                 }
             }
-        }
+        })
     }
 
     /// The [`Streams`](Stream) of a [`Video`]

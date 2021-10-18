@@ -9,9 +9,11 @@ pub mod player_response;
 
 #[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct ChannelNameRuns {
-    pub runs: Vec<ChannelNameRun>,
+pub struct Runs<T> {
+    pub runs: Vec<T>,
 }
+
+pub type ChannelNameRuns = Runs<ChannelNameRun>;
 
 #[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -36,7 +38,7 @@ pub struct BrowseEndpoint {
 #[serde(rename_all = "camelCase", untagged)]
 pub enum Text {
     SimpleText(SimpleText),
-    Runs(Runs),
+    Runs(TitleRuns),
 }
 
 #[derive(Deserialize, Clone, Default)]
@@ -53,11 +55,7 @@ impl Deref for SimpleText {
     }
 }
 
-#[derive(Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Runs {
-    pub runs: Vec<TitleRun>,
-}
+pub type TitleRuns = Runs<TitleRun>;
 
 #[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]

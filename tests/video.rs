@@ -189,7 +189,12 @@ async fn related() -> Result<(), Box<dyn std::error::Error>> {
 
     let video = CLIENT.video(id).await?;
 
-    video.related().take(100).collect::<Vec<_>>().await;
+    video
+        .related()
+        .expect("No related videos found")
+        .take(100)
+        .collect::<Vec<_>>()
+        .await;
 
     Ok(())
 }
