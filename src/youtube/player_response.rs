@@ -1,6 +1,5 @@
 use std::time::Duration;
 
-use chrono::{DateTime, Utc};
 use reqwest::Url;
 use serde::Deserialize;
 
@@ -83,8 +82,6 @@ pub struct Format {
 pub struct CommonFormat {
     pub url: Url,
     pub mime_type: String,
-    #[serde_as(as = "serde_with::TimestampMilliSeconds<String>")]
-    pub last_modified: DateTime<Utc>,
     pub itag: u64,
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     #[serde(default)]
