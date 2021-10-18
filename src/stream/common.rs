@@ -1,6 +1,5 @@
 use crate::{youtube::player_response::CommonFormat, Client};
 
-use chrono::{DateTime, Utc};
 use reqwest::Url;
 
 use std::time::Duration;
@@ -58,11 +57,6 @@ impl Stream {
         &self.format.mime_type
     }
 
-    /// The [`DateTime<Utc>`] of when a [`Stream`] was last modified
-    pub fn last_modified(&self) -> DateTime<Utc> {
-        self.format.last_modified
-    }
-
     /// The bitrate of a [`Stream`]
     pub fn bitrate(&self) -> u64 {
         self.format.bitrate
@@ -77,7 +71,6 @@ impl Stream {
         debug
             .field("url", &self.url())
             .field("mime_type", &self.mime_type())
-            .field("last_modified", &self.last_modified())
             .field("bitrate", &self.bitrate())
             .field("duration", &self.duration());
     }
