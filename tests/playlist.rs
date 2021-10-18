@@ -1,7 +1,7 @@
 use futures::StreamExt;
 use once_cell::sync::Lazy;
 
-static CLIENT: Lazy<ytextract::Client> = Lazy::new(|| ytextract::Client::new());
+static CLIENT: Lazy<ytextract::Client> = Lazy::new(ytextract::Client::new);
 
 #[async_std::test]
 async fn get() -> Result<(), Box<dyn std::error::Error>> {

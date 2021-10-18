@@ -57,19 +57,13 @@ pub enum Next {
     Continuation(String),
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Api {
     pub(crate) http: reqwest::Client,
 }
 
 impl Api {
-    pub fn new() -> Self {
-        Self {
-            http: reqwest::Client::new(),
-        }
-    }
-
-    async fn get<T: serde::de::DeserializeOwned, R: Serialize>(
+    async fn get<T: serde::de::DeserializeOwned, R: Serialize + Send + Sync>(
         &self,
         endpoint: &'static str,
         request: R,

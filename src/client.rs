@@ -7,7 +7,7 @@ use crate::{
 /// Note: This structure already uses an [`Arc`](std::sync::Arc) internally, so
 ///       it does not need to be wrapped again.
 #[allow(missing_debug_implementations)]
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Client {
     pub(crate) api: Api,
 }
@@ -15,7 +15,7 @@ pub struct Client {
 impl Client {
     /// Create a new [`Client`]
     pub fn new() -> Self {
-        Self { api: Api::new() }
+        Self::default()
     }
 
     /// Get a [`Video`] identified by a [`Id`](video::Id)

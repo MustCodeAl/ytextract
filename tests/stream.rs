@@ -1,6 +1,6 @@
 use once_cell::sync::Lazy;
 
-static CLIENT: Lazy<ytextract::Client> = Lazy::new(|| ytextract::Client::new());
+static CLIENT: Lazy<ytextract::Client> = Lazy::new(ytextract::Client::new);
 
 macro_rules! define_test {
     ($fn:ident, $id:literal, $($attr:meta)?) => {
