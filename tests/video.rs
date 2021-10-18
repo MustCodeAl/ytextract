@@ -168,7 +168,6 @@ mod error {
         NudityOrSexualContentViolation
     );
     define_test!(account_terminated, "Pfhpe6shO2U", AccountTerminated);
-    define_test!(tos_violation, "tJievCeKBs0", TermsOfServiceViolation);
 
     #[async_std::test]
     async fn copyright_claim() -> Result<(), Box<dyn std::error::Error>> {
