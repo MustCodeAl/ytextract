@@ -142,7 +142,23 @@ impl PlayabilityStatus {
             "This video requires payment to watch." => Youtube::PurchaseRequired,
             "This video may be inappropriate for some users." => Youtube::AgeRestricted,
             copyright if copyright.starts_with("This video is no longer available due to a copyright claim by") => {
-                let who = copyright.strip_prefix("This video is no longer available due to a copyright claim by ").unwrap().strip_suffix('.').unwrap();
+                let who = copyright
+                    .strip_prefix("This video is no longer available due to a copyright claim by ")
+                    .unwrap()
+                    .strip_suffix('.')
+                    .unwrap();
+
+                Youtube::CopyrightClaim {
+                    claiment: who.to_string()
+                }
+            }
+            copyright if copyright.starts_with("This video contains content from ") => {
+                let who = copyright
+                    .strip_prefix("This video contains content from ")
+                    .unwrap()
+                    .strip_suffix(", who has blocked it in your country on copyright grounds.")
+                    .unwrap();
+
                 Youtube::CopyrightClaim {
                     claiment: who.to_string()
                 }
