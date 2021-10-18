@@ -20,7 +20,7 @@ pub struct Contents {
 #[serde(rename_all = "camelCase")]
 pub struct TwoColumnWatchNextResults {
     pub results: Results,
-    pub secondary_results: SecondaryResults,
+    pub secondary_results: Option<SecondaryResults>,
 }
 
 #[derive(Clone, Deserialize)]

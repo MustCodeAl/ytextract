@@ -12,6 +12,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let related = video
         .related()
+        .expect("No related videos found")
         .take(amount.parse()?)
         .collect::<Vec<_>>()
         .await;
