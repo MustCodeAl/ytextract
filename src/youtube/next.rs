@@ -73,7 +73,7 @@ pub enum Content {
 #[derive(Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VideoPrimaryInfoRenderer {
-    pub sentiment_bar: Option<SentimentBar>,
+    pub video_actions: VideoActions,
     #[serde(default)]
     pub super_title_link: SuperTitleLink,
     pub date_text: SimpleText,
@@ -81,23 +81,26 @@ pub struct VideoPrimaryInfoRenderer {
 
 impl VideoPrimaryInfoRenderer {
     pub fn ratings(&self) -> Option<(u64, u64)> {
-        let fixed_tooltip = self
-            .sentiment_bar
+        // `like this video along with 4,457 other people` or `I like this`
+        let label = &self
+            .video_actions
+            .menu_renderer
+            .like_button()?
+            .accessibility
             .as_ref()?
-            .sentiment_bar_renderer
-            .tooltip
-            .replace(',', "");
+            .label;
 
-        let (likes, dislikes) = fixed_tooltip
-            .split_once(" / ")
-            .expect("sentimentBar tooltip did not have a '/'");
+        let (_, likes) = label.split_once("like this video along with ")?;
+        let (likes, _) = likes.split_once(" other people")?;
+
+        let likes = likes.replace(',', "");
 
         let likes = likes
             .parse()
             .expect("Likes we not parsable as a unsigned integer");
-        let dislikes = dislikes
-            .parse()
-            .expect("Dislikes we not parsable as a unsigned integer");
+
+        // TODO: remove `ratings()` and replace it with `likes()` with v0.11.0
+        let dislikes = 0;
 
         Some((likes, dislikes))
     }
@@ -106,17 +109,44 @@ impl VideoPrimaryInfoRenderer {
         self.super_title_link.runs.iter().map(|x| x.text.as_str())
     }
 }
-
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct SentimentBar {
-    pub sentiment_bar_renderer: SentimentBarRenderer,
+pub struct VideoActions {
+    pub menu_renderer: MenuRenderer,
+}
+
+#[derive(Clone, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct MenuRenderer {
+    pub top_level_buttons: Vec<TopLevelButton>,
+}
+
+impl MenuRenderer {
+    fn like_button(&self) -> Option<&ToggleButtonRenderer> {
+        self.top_level_buttons.iter().find_map(|x| match x {
+            &TopLevelButton::ToggleButtonRenderer(ref button) => Some(button),
+            &TopLevelButton::ButtonRenderer {} => None,
+        })
+    }
 }
 
 #[derive(Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SentimentBarRenderer {
-    pub tooltip: String,
+pub enum TopLevelButton {
+    ToggleButtonRenderer(ToggleButtonRenderer),
+    ButtonRenderer {},
+}
+
+#[derive(Clone, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct ToggleButtonRenderer {
+    pub accessibility: Option<AccessibilityData>,
+}
+
+#[derive(Clone, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct AccessibilityData {
+    pub label: String,
 }
 
 #[derive(Clone, Deserialize, Default)]

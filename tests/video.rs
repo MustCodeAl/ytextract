@@ -60,7 +60,8 @@ async fn get() -> Result<(), Box<dyn std::error::Error>> {
     let ratings = video.ratings();
     if let Ratings::Allowed { likes, dislikes } = ratings {
         assert!(likes >= 51_745);
-        assert!(dislikes >= 622);
+        // YouTube currently hides dislikes. Hopefully they will walk back so keeping this here.
+        //assert!(dislikes >= 622);
     } else {
         unreachable!();
     }
