@@ -130,19 +130,17 @@ impl PlayabilityStatus {
         use crate::error::Youtube;
 
         match self.reason.as_str() {
-            "This video is unavailable." => Youtube::NotFound,
+            "This video is unavailable" => Youtube::NotFound,
             "This video is no longer available because the YouTube account associated with this video has been terminated." => Youtube::AccountTerminated,
             "This video has been removed by the uploader" => Youtube::RemovedByUploader,
-            "This video has been removed for violating YouTube's policy on nudity or sexual content." => Youtube::NudityOrSexualContentViolation,
-            "This video is private." => Youtube::Private,
+            "This video has been removed for violating YouTube's policy on nudity or sexual content" => Youtube::NudityOrSexualContentViolation,
+            "This video is private" => Youtube::Private,
             "This video has been removed for violating YouTube's Terms of Service." => Youtube::TermsOfServiceViolation,
             "This video requires payment to watch." => Youtube::PurchaseRequired,
             "This video may be inappropriate for some users." => Youtube::AgeRestricted,
             copyright if copyright.starts_with("This video is no longer available due to a copyright claim by") => {
                 let who = copyright
                     .strip_prefix("This video is no longer available due to a copyright claim by ")
-                    .unwrap()
-                    .strip_suffix('.')
                     .unwrap();
 
                 Youtube::CopyrightClaim {
