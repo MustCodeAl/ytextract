@@ -299,16 +299,19 @@ pub struct OptionalChannelNameRun {
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Continuation {
-    pub on_response_received_endpoints: (OnResponseReceivedAction,),
+    pub on_response_received_endpoints: Option<(OnResponseReceivedAction,)>,
 }
 
 impl Continuation {
     pub fn into_videos(self) -> impl Iterator<Item = RelatedItem> {
-        self.on_response_received_endpoints
-            .0
-            .append_continuation_items_action
-            .continuation_items
-            .into_iter()
+        if let Some(end) = self.on_response_received_endpoints {
+            end.0
+                .append_continuation_items_action
+                .continuation_items
+                .into_iter()
+        } else {
+            vec![].into_iter()
+        }
     }
 }
 
