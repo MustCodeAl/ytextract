@@ -23,7 +23,9 @@ impl std::str::FromStr for Id {
     type Err = crate::error::Id<0>;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        const PREFIXES: &[&str] = &["https://www.youtube.com/playlist?list="];
+        const PREFIXES: &[&str] = &["https://www.youtube.com/playlist?list=",
+                                    "https://youtube.com/playlist?list=",
+                                    "https://m.youtube.com/playlist?list="];
         const ID_PREFIXES: &[&str] = &["PL", "RD", "UL", "UU", "PU", "OL", "LL", "FL", "WL"];
 
         let id = PREFIXES
