@@ -145,3 +145,15 @@ pub fn parse_date(value: &str) -> Option<chrono::NaiveDate> {
 
     chrono::NaiveDate::parse_from_str(value, "%b %e, %Y").ok()
 }
+
+/// Strips the various possible domains of a youtube URL
+pub fn strip_url_prefix(url: &str) -> &str {
+    const PREFIXES: &[&str] = &[
+        "https://www.youtube.com/",
+        "https://m.youtube.com/",
+        "https://youtube.com/",
+        "https://youtu.be/",
+    ];
+
+    PREFIXES.iter().find_map(|prefix| url.strip_prefix(prefix)).unwrap_or(url)
+}

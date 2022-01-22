@@ -11,6 +11,7 @@ use crate::{
             playlist::{PlaylistSidebarPrimaryInfoRenderer, PlaylistSidebarSecondaryInfoRenderer},
         },
         innertube::Browse,
+        self,
     },
     Client, Thumbnail,
 };
@@ -23,17 +24,9 @@ impl std::str::FromStr for Id {
     type Err = crate::error::Id<0>;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        const PREFIXES: &[&str] = &["https://www.youtube.com/playlist?list=",
-                                    "https://youtube.com/playlist?list=",
-                                    "https://m.youtube.com/playlist?list="];
         const ID_PREFIXES: &[&str] = &["PL", "RD", "UL", "UU", "PU", "OL", "LL", "FL", "WL"];
 
-        let id = PREFIXES
-            .iter()
-            .find_map(|prefix| s.strip_prefix(prefix))
-            // No Prefix matched. Possibly naked id (OLWUqW4BRl4). Length and
-            // correctness will be checked later.
-            .unwrap_or(s);
+        let id = youtube::strip_url_prefix(s).strip_prefix("playlist?list=").unwrap_or(s);
 
         if id.chars().all(crate::id::validate_char)
             && ID_PREFIXES.iter().any(|prefix| id.starts_with(prefix))

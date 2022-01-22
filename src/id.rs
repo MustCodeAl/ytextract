@@ -66,8 +66,11 @@ macro_rules! define_id {
 
             fn from_str(value: &str) -> Result<Self, Self::Err> {
                 use std::convert::TryInto;
+                use crate::youtube;
 
                 const PREFIXES: &[&str] = &[$($prefix),*];
+
+                let value = youtube::strip_url_prefix(value);
 
                 let value = PREFIXES
                     .iter()

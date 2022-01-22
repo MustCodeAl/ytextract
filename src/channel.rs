@@ -12,7 +12,7 @@ define_id! {
     24,
     "An Id describing a [`Channel`]",
     [
-        "https://www.youtube.com/channel/",
+        "channel/",
     ]
 }
 

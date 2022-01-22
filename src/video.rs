@@ -309,9 +309,8 @@ define_id! {
     11,
     "An Id describing a [`Video`]",
     [
-        "https://www.youtube.com/watch?v=",
-        "https://youtu.be/",
-        "https://www.youtube.com/embed/",
+        "watch?v=",
+        "embed/",
     ]
 }
 
