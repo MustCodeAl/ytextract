@@ -1,7 +1,11 @@
+use std::time::Duration;
+
 use serde::Serialize;
 
-use crate::youtube::player_response;
+use crate::{youtube::player_response, Error};
 
+const RETRYS: u32 = 5;
+const TIMEOUT: Duration = Duration::from_secs(5);
 const DUMP: bool = option_env!("YTEXTRACT_DUMP").is_some();
 const BASE_URL: &str = "https://youtubei.googleapis.com/youtubei/v1";
 const API_KEY: &str = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
@@ -62,6 +66,19 @@ pub struct Api {
     pub(crate) http: reqwest::Client,
 }
 
+fn dump(endpoint: &'static str, response: &str) {
+    let _ = std::fs::create_dir(endpoint);
+    use std::time::SystemTime;
+    let time = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .expect("TIME");
+    std::fs::write(
+        &format!("{}/{}.json", endpoint, time.as_millis()),
+        &response,
+    )
+    .expect("Write");
+}
+
 impl Api {
     async fn get<T: serde::de::DeserializeOwned, R: Serialize + Send + Sync>(
         &self,
@@ -78,38 +95,49 @@ impl Api {
 
         let request = Request { context, request };
 
-        let response = self
+        let request = self
             .http
             .post(format!("{}/{}", BASE_URL, endpoint))
             .header("X-Goog-Api-Key", API_KEY)
             .json(&request)
-            .send()
-            .await?
-            .error_for_status()?
-            .text()
-            .await?;
+            .timeout(TIMEOUT);
 
-        if DUMP {
-            let _ = std::fs::create_dir(endpoint);
-            use std::time::SystemTime;
-            let time = SystemTime::now()
-                .duration_since(SystemTime::UNIX_EPOCH)
-                .expect("TIME");
-            std::fs::write(
-                &format!("{}/{}.json", endpoint, time.as_millis()),
-                &response,
-            )
-            .expect("Write");
-        }
+        let mut retry = 0;
 
-        match serde_json::from_str(&response) {
-            Ok(ok) => Ok(ok),
-            Err(err) => {
-                eprintln!("Unable to parse JSON: {}", err);
-                eprintln!(
-                    "This is a bug. Please report it at https://github.com/ATiltedTree/ytextract"
-                );
-                panic!("Encountered fatal error: {}. Please report this.", err);
+        loop {
+            let response = request
+                .try_clone()
+                .unwrap()
+                .send()
+                .await
+                .and_then(|x| x.error_for_status())
+                .map(|x| x.text());
+
+            match response {
+                Ok(res) => {
+                    let response = res.await?;
+
+                    if DUMP {
+                        dump(endpoint, &response)
+                    }
+
+                    let res = serde_json::from_str::<T>(&response).expect("Failed to parse JSON");
+                    break Ok(res);
+                }
+                Err(err) => {
+                    if err.is_timeout() {
+                        if retry == RETRYS {
+                            log::error!("Timed out {} times. Stopping...", RETRYS);
+                            break Err(Error::Request(err));
+                        } else {
+                            log::warn!("Timeout reached, retrying...");
+                            retry += 1;
+                            continue;
+                        }
+                    } else {
+                        break Err(Error::Request(err));
+                    }
+                }
             }
         }
     }
