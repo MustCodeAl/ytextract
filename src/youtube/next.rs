@@ -37,26 +37,30 @@ pub struct Results2 {
 
 impl Results2 {
     pub fn primary(&self) -> &VideoPrimaryInfoRenderer {
-        if let Content::VideoPrimaryInfoRenderer(ret) = &self.contents[0] {
+        let index = self.contents.len() - 3;
+        if let Content::VideoPrimaryInfoRenderer(ret) = &self.contents[index] {
             ret
         } else {
-            unreachable!("VideoPrimaryInfoRenderer was not at index 0")
+            unreachable!("VideoPrimaryInfoRenderer was not at index {}", index)
         }
     }
 
     pub fn secondary(&self) -> &VideoSecondaryInfoRenderer {
-        if let Content::VideoSecondaryInfoRenderer(ret) = &self.contents[1] {
+        let index = self.contents.len() - 2;
+        if let Content::VideoSecondaryInfoRenderer(ret) = &self.contents[index] {
             ret
         } else {
-            unreachable!("VideoSecondaryInfoRenderer was not at index 1")
+            dbg!(self.contents.len());
+            unreachable!("VideoSecondaryInfoRenderer was not at index {}" , index)
         }
     }
 
     pub fn comments(&self) -> Option<&ContinuationItemRenderer> {
-        if let Content::ItemSectionRenderer(ret) = &self.contents[2] {
+        let index = self.contents.len() - 1;
+        if let Content::ItemSectionRenderer(ret) = &self.contents[index] {
             ret.contents.0.continuation_item_renderer.as_ref()
         } else {
-            unreachable!("ItemSectionRenderer was not at index 2")
+            unreachable!("ItemSectionRenderer was not at index {}" , index)
         }
     }
 }
@@ -68,6 +72,7 @@ pub enum Content {
     VideoSecondaryInfoRenderer(VideoSecondaryInfoRenderer),
     ItemSectionRenderer(ItemSectionRenderer),
     MerchandiseShelfRenderer {},
+    TicketShelfRenderer {},
 }
 
 #[derive(Clone, Deserialize)]
