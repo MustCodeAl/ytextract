@@ -138,6 +138,7 @@ impl PlayabilityStatus {
             "This video has been removed for violating YouTube's Terms of Service." => Youtube::TermsOfServiceViolation,
             "This video requires payment to watch." => Youtube::PurchaseRequired,
             "This video may be inappropriate for some users." => Youtube::AgeRestricted,
+            "This video is not available in your country" => Youtube::GeoRestricted,
             copyright if copyright.starts_with("This video is no longer available due to a copyright claim by") => {
                 let who = copyright
                     .strip_prefix("This video is no longer available due to a copyright claim by ")
