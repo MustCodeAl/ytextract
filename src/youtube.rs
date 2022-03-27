@@ -155,5 +155,8 @@ pub fn strip_url_prefix(url: &str) -> &str {
         "https://youtu.be/",
     ];
 
-    PREFIXES.iter().find_map(|prefix| url.strip_prefix(prefix)).unwrap_or(url)
+    PREFIXES
+        .iter()
+        .find_map(|prefix| url.strip_prefix(prefix))
+        .unwrap_or(url)
 }
