@@ -6,12 +6,12 @@ pub use self::video::Video;
 
 use crate::{
     youtube::{
+        self,
         browse::{
             self,
             playlist::{PlaylistSidebarPrimaryInfoRenderer, PlaylistSidebarSecondaryInfoRenderer},
         },
         innertube::Browse,
-        self,
     },
     Client, Thumbnail,
 };
@@ -26,7 +26,9 @@ impl std::str::FromStr for Id {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         const ID_PREFIXES: &[&str] = &["PL", "RD", "UL", "UU", "PU", "OL", "LL", "FL", "WL"];
 
-        let id = youtube::strip_url_prefix(s).strip_prefix("playlist?list=").unwrap_or(s);
+        let id = youtube::strip_url_prefix(s)
+            .strip_prefix("playlist?list=")
+            .unwrap_or(s);
 
         if id.chars().all(crate::id::validate_char)
             && ID_PREFIXES.iter().any(|prefix| id.starts_with(prefix))
