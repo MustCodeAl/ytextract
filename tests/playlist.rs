@@ -102,7 +102,6 @@ mod metadata {
     define_test!(normal, "PLI5YfMzCfRtZ8eV576YoY3vIYrHjyVm_e");
     define_test!(old, "PL601B2E69B03FAB9D");
     define_test!(no_videos, "PL4lCao7KL_QFodcLWhDpGCYnngnHtQ-Xf");
-    define_test!(youtube_mix, "RDCLAK5uy_lf8okgl2ygD075nhnJVjlfhwp8NsUgEbs");
 }
 
 mod videos {
@@ -133,7 +132,6 @@ mod videos {
     define_test!(channel_uploads, "UUTMt7iMWa7jy0fNXIktwyLA");
     define_test!(song_album, "OLAK5uy_lLeonUugocG5J0EUAEDmbskX4emejKwcM");
     define_test!(old, "PL601B2E69B03FAB9D");
-    define_test!(youtube_mix, "RDCLAK5uy_lf8okgl2ygD075nhnJVjlfhwp8NsUgEbs");
 }
 
 mod error {
