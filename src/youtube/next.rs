@@ -240,6 +240,7 @@ pub enum RelatedItem {
     CompactMovieRenderer(CompactMovieRenderer),
     ContinuationItemRenderer(ContinuationItemRenderer),
     PromotedSparklesWebRenderer {},
+    CompactPromotedVideoRenderer {},
 }
 
 #[derive(Clone, Deserialize)]
