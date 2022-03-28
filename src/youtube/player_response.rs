@@ -139,6 +139,7 @@ impl PlayabilityStatus {
             "This video is private" => Youtube::Private,
             "This video has been removed for violating YouTube's Terms of Service." => Youtube::TermsOfServiceViolation,
             "This video has been removed for violating YouTube's Terms of Service" => Youtube::TermsOfServiceViolation,
+            "This video has been removed for violating YouTube's Community Guidelines" => Youtube::CommunityGuidelineViolation,
             "This video is no longer available due to a privacy claim by a third party" => Youtube::PrivacyClaim,
             "This video requires payment to watch." => Youtube::PurchaseRequired,
             "This video may be inappropriate for some users." => Youtube::AgeRestricted,
