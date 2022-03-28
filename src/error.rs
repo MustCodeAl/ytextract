@@ -80,7 +80,7 @@ pub enum Youtube {
     #[error("a video is not available due to violations of YouTube's Terms of Service")]
     TermsOfServiceViolation,
 
-    /// A [`Video`](crate::Video) is not available due to a copyright claim by a third party`
+    /// A [`Video`](crate::Video) is not available due to a privacy claim by a third party`
     #[error("a video is not available due to a privacy claim by a third party")]
     PrivacyClaim,
 
