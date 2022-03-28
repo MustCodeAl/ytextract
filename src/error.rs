@@ -68,6 +68,10 @@ pub enum Youtube {
     #[error("the channel or the channel associated with a video was terminated")]
     AccountTerminated,
 
+    /// The channel or the channel associated with a video was deleted.
+    #[error("the channel or the channel associated with a video was deleted")]
+    AccountDeleted,
+
     /// A [`Video`](crate::Video) was removed by the uploader.
     #[error("a video was removed by the uploader")]
     RemovedByUploader,
@@ -75,6 +79,10 @@ pub enum Youtube {
     /// A [`Video`](crate::Video) is not available due to violations of YouTube's Terms of Service.
     #[error("a video is not available due to violations of YouTube's Terms of Service")]
     TermsOfServiceViolation,
+
+    /// A [`Video`](crate::Video) is not available due to a privacy claim by a third party`
+    #[error("a video is not available due to a privacy claim by a third party")]
+    PrivacyClaim,
 
     /// A [`Video`](crate::Video) is not available due to a copyright claim by the `claiment`
     #[error("a video is not available due to a copyright claim by '{claiment}'")]
