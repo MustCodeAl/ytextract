@@ -50,7 +50,6 @@ impl Results2 {
         if let Content::VideoSecondaryInfoRenderer(ret) = &self.contents[index] {
             ret
         } else {
-            dbg!(self.contents.len());
             unreachable!("VideoSecondaryInfoRenderer was not at index {}" , index)
         }
     }
