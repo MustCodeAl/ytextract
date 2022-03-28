@@ -137,6 +137,7 @@ impl PlayabilityStatus {
             "This video has been removed for violating YouTube's policy on nudity or sexual content" => Youtube::NudityOrSexualContentViolation,
             "This video is private" => Youtube::Private,
             "This video has been removed for violating YouTube's Terms of Service." => Youtube::TermsOfServiceViolation,
+            "This video is no longer available due to a privacy claim by a third party" => Youtube::PrivacyClaim,
             "This video requires payment to watch." => Youtube::PurchaseRequired,
             "This video may be inappropriate for some users." => Youtube::AgeRestricted,
             "This video is not available in your country" => Youtube::GeoRestricted,
