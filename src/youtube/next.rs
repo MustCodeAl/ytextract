@@ -37,30 +37,33 @@ pub struct Results2 {
 
 impl Results2 {
     pub fn primary(&self) -> &VideoPrimaryInfoRenderer {
-        let index = self.contents.len() - 3;
-        if let Content::VideoPrimaryInfoRenderer(ret) = &self.contents[index] {
-            ret
-        } else {
-            unreachable!("VideoPrimaryInfoRenderer was not at index {}", index)
-        }
+        self.contents
+            .iter()
+            .find_map(|x| match x {
+                Content::VideoPrimaryInfoRenderer(ret) => Some(ret),
+                _ => None,
+            })
+            .expect("VideoPrimaryInfoRenderer was not found")
     }
 
     pub fn secondary(&self) -> &VideoSecondaryInfoRenderer {
-        let index = self.contents.len() - 2;
-        if let Content::VideoSecondaryInfoRenderer(ret) = &self.contents[index] {
-            ret
-        } else {
-            unreachable!("VideoSecondaryInfoRenderer was not at index {}" , index)
-        }
+        self.contents
+            .iter()
+            .find_map(|x| match x {
+                Content::VideoSecondaryInfoRenderer(ret) => Some(ret),
+                _ => None,
+            })
+            .expect("VideoSecondaryInfoRenderer was not found")
     }
 
     pub fn comments(&self) -> Option<&ContinuationItemRenderer> {
-        let index = self.contents.len() - 1;
-        if let Content::ItemSectionRenderer(ret) = &self.contents[index] {
-            ret.contents.0.continuation_item_renderer.as_ref()
-        } else {
-            unreachable!("ItemSectionRenderer was not at index {}" , index)
-        }
+        self.contents
+            .iter()
+            .find_map(|x| match x {
+                Content::ItemSectionRenderer(ret) => Some(ret),
+                _ => None,
+            })
+            .and_then(|x| x.contents.0.continuation_item_renderer.as_ref())
     }
 }
 
