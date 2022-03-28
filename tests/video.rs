@@ -175,7 +175,11 @@ mod error {
     define_test!(account_deleted, "9GhIacgO6-s", AccountDeleted);
     define_test!(privacy_claim, "DESqNHJ-28k", PrivacyClaim);
     define_test!(tos_violation, "4270c5qWPBg", TermsOfServiceViolation);
-    define_test!(community_guideline_violation, "M78rlxEMBxk", CommunityGuidelineViolation);
+    define_test!(
+        community_guideline_violation,
+        "M78rlxEMBxk",
+        CommunityGuidelineViolation
+    );
 
     #[async_std::test]
     async fn copyright_claim() -> Result<(), Box<dyn std::error::Error>> {

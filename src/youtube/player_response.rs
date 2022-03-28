@@ -1,8 +1,8 @@
 use std::time::Duration;
 
+use crate::error::Youtube;
 use reqwest::Url;
 use serde::Deserialize;
-use crate::Error::Youtube;
 
 use super::Thumbnails;
 
@@ -128,8 +128,6 @@ pub struct PlayabilityStatus {
 
 impl PlayabilityStatus {
     fn as_error(&self) -> crate::error::Youtube {
-        use crate::error::Youtube;
-
         match self.reason.as_str() {
             "This video is unavailable" => Youtube::NotFound,
             "This video is no longer available because the YouTube account associated with this video has been terminated." => Youtube::AccountTerminated,

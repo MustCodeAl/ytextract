@@ -128,9 +128,9 @@ pub struct MenuRenderer {
 impl MenuRenderer {
     fn like_button(&self) -> Option<&ToggleButtonRenderer> {
         self.top_level_buttons.iter().find_map(|x| match x {
-            &TopLevelButton::ToggleButtonRenderer(ref button) => Some(button),
-            &TopLevelButton::ButtonRenderer {} => None,
-            &TopLevelButton::DownloadButtonRenderer {} => None,
+            TopLevelButton::ToggleButtonRenderer(ref button) => Some(button),
+            TopLevelButton::ButtonRenderer {} => None,
+            TopLevelButton::DownloadButtonRenderer {} => None,
         })
     }
 }
