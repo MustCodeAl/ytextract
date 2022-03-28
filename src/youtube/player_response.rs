@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use reqwest::Url;
 use serde::Deserialize;
+use crate::Error::Youtube;
 
 use super::Thumbnails;
 
@@ -139,6 +140,7 @@ impl PlayabilityStatus {
             "This video requires payment to watch." => Youtube::PurchaseRequired,
             "This video may be inappropriate for some users." => Youtube::AgeRestricted,
             "This video is not available in your country" => Youtube::GeoRestricted,
+            "This video is no longer available because the uploader has closed their YouTube account." => Youtube::AccountDeleted,
             copyright if copyright.starts_with("This video is no longer available due to a copyright claim by") => {
                 let who = copyright
                     .strip_prefix("This video is no longer available due to a copyright claim by ")

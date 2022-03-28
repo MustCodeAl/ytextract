@@ -68,6 +68,10 @@ pub enum Youtube {
     #[error("the channel or the channel associated with a video was terminated")]
     AccountTerminated,
 
+    /// The channel or the channel associated with a video was deleted.
+    #[error("the channel or the channel associated with a video was deleted")]
+    AccountDeleted,
+
     /// A [`Video`](crate::Video) was removed by the uploader.
     #[error("a video was removed by the uploader")]
     RemovedByUploader,
