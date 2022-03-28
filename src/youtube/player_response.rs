@@ -133,6 +133,7 @@ impl PlayabilityStatus {
         match self.reason.as_str() {
             "This video is unavailable" => Youtube::NotFound,
             "This video is no longer available because the YouTube account associated with this video has been terminated." => Youtube::AccountTerminated,
+            "The YouTube account associated with this video has been terminated due to multiple third-party notifications of copyright infringement." => Youtube::AccountTerminated,
             "This video has been removed by the uploader" => Youtube::RemovedByUploader,
             "This video has been removed for violating YouTube's policy on nudity or sexual content" => Youtube::NudityOrSexualContentViolation,
             "This video is private" => Youtube::Private,
