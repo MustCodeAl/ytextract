@@ -5,7 +5,7 @@ use serde::Serialize;
 use crate::{youtube::player_response, Error};
 
 const RETRYS: u32 = 5;
-const TIMEOUT: Duration = Duration::from_secs(5);
+const TIMEOUT: Duration = Duration::from_secs(30);
 const DUMP: bool = option_env!("YTEXTRACT_DUMP").is_some();
 const BASE_URL: &str = "https://youtubei.googleapis.com/youtubei/v1";
 const API_KEY: &str = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
