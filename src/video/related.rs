@@ -276,6 +276,11 @@ impl<'a> Channel<'a> {
     pub fn badges(&self) -> impl Iterator<Item = crate::channel::Badge> + '_ {
         self.badges.iter().map(crate::channel::Badge::from)
     }
+
+    /// Refetch this channel for more information.
+    pub async fn upgrade(&self) -> Option<crate::Result<crate::Channel>> {
+        Some(self.client.channel(self.id?).await)
+    }
 }
 
 impl<'a> std::fmt::Debug for Channel<'a> {
