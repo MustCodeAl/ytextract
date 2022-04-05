@@ -1,5 +1,4 @@
 use futures::StreamExt;
-use ytextract::video::Ratings;
 use ytextract::Client;
 
 #[tokio::test]
@@ -54,16 +53,7 @@ async fn get() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(channel.id(), channel.upgrade().await?.id());
     assert!(!video.description().is_empty());
     assert!(video.views() >= 1_068_917);
-
-    let ratings = video.ratings();
-    if let Ratings::Allowed { likes, dislikes } = ratings {
-        assert!(likes >= 51_745);
-        // YouTube currently hides dislikes. Hopefully they will walk back so keeping this here.
-        //assert!(dislikes >= 622);
-    } else {
-        unreachable!();
-    }
-
+    assert!(video.likes() >= Some(51_745));
     assert!(!video.live());
     assert!(!video.thumbnails().is_empty());
     assert_eq!(video.date(), chrono::NaiveDate::from_ymd(2021, 4, 14));
@@ -96,9 +86,9 @@ async fn eq_channel() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[tokio::test]
-async fn ratings_not_allowed() -> Result<(), Box<dyn std::error::Error>> {
+async fn likes_not_allowed() -> Result<(), Box<dyn std::error::Error>> {
     let video = Client::new().video("9Jg_Fwc0QOY".parse()?).await?;
-    assert_eq!(video.ratings(), Ratings::NotAllowed);
+    assert_eq!(video.likes(), None);
 
     Ok(())
 }
