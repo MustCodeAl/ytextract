@@ -22,7 +22,7 @@ This includes:
 ## Basic Example
 
 ```rust
-#[async_std::main]
+#[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Get a Client for making request
     let client = ytextract::Client::new();

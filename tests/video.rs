@@ -4,7 +4,7 @@ use ytextract::video::Ratings;
 
 static CLIENT: Lazy<ytextract::Client> = Lazy::new(ytextract::Client::new);
 
-#[async_std::test]
+#[tokio::test]
 async fn get() -> Result<(), Box<dyn std::error::Error>> {
     let video = CLIENT
         .video("https://www.youtube.com/watch?v=7B2PIVSWtJA".parse()?)
@@ -77,7 +77,7 @@ async fn get() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn eq() -> Result<(), Box<dyn std::error::Error>> {
     let video1 = CLIENT.video("7B2PIVSWtJA".parse()?).await?;
     let video2 = CLIENT.video("7B2PIVSWtJA".parse()?).await?;
@@ -87,7 +87,7 @@ async fn eq() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn eq_channel() -> Result<(), Box<dyn std::error::Error>> {
     let video1 = CLIENT.video("7B2PIVSWtJA".parse()?).await?;
     let video2 = CLIENT.video("7B2PIVSWtJA".parse()?).await?;
@@ -97,7 +97,7 @@ async fn eq_channel() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn ratings_not_allowed() -> Result<(), Box<dyn std::error::Error>> {
     let video = CLIENT.video("9Jg_Fwc0QOY".parse()?).await?;
     assert_eq!(video.ratings(), Ratings::NotAllowed);
@@ -110,7 +110,7 @@ mod metadata {
 
     macro_rules! define_test {
         ($fn:ident, $id:literal) => {
-            #[async_std::test]
+            #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
                 let video = CLIENT.video(id).await?;
@@ -149,7 +149,7 @@ mod error {
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $error:ident) => {
-            #[async_std::test]
+            #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
                 assert_matches!(
@@ -181,7 +181,7 @@ mod error {
         CommunityGuidelineViolation
     );
 
-    #[async_std::test]
+    #[tokio::test]
     async fn copyright_claim() -> Result<(), Box<dyn std::error::Error>> {
         let id = "6MNavkSGntQ".parse()?;
 
@@ -195,7 +195,7 @@ mod error {
     }
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn related() -> Result<(), Box<dyn std::error::Error>> {
     let id = "9bZkp7q19f0".parse()?;
 

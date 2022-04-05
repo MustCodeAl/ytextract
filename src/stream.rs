@@ -3,7 +3,7 @@
 //! # Example
 //!
 //! ```rust
-//! # #[async_std::main] async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # #[tokio::main] async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //! let client = ytextract::Client::new();
 //!
 //! let streams = client.streams("nI2e-J6fsuk".parse()?).await?;

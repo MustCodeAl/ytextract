@@ -3,7 +3,7 @@ use once_cell::sync::Lazy;
 
 static CLIENT: Lazy<ytextract::Client> = Lazy::new(ytextract::Client::new);
 
-#[async_std::test]
+#[tokio::test]
 async fn get() -> Result<(), Box<dyn std::error::Error>> {
     let playlist = CLIENT
         .playlist("PLCSusC_jlo14BH5hHnOh9b0O18HtGT3eP".parse()?)
@@ -28,7 +28,7 @@ async fn get() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn eq() -> Result<(), Box<dyn std::error::Error>> {
     let playlist1 = CLIENT
         .playlist("PLCSusC_jlo15M6x0Ot8gznM-QA8CriNk4".parse()?)
@@ -42,7 +42,7 @@ async fn eq() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn eq_channel() -> Result<(), Box<dyn std::error::Error>> {
     let playlist = CLIENT
         .playlist("PLCSusC_jlo15M6x0Ot8gznM-QA8CriNk4".parse()?)
@@ -53,7 +53,7 @@ async fn eq_channel() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn video() -> Result<(), Box<dyn std::error::Error>> {
     let playlist = CLIENT
         .playlist("PLCSusC_jlo14F22jss8ZtDLbpmRQIVLzr".parse()?)
@@ -86,7 +86,7 @@ mod metadata {
     macro_rules! define_test {
         ($fn:ident, $id:literal, $($attr:meta)?) => {
             $(#[$attr])?
-            #[async_std::test]
+            #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id: ytextract::playlist::Id = $id.parse()?;
                 let playlist = CLIENT.playlist(id.clone()).await?;
@@ -111,7 +111,7 @@ mod videos {
     macro_rules! define_test {
         ($fn:ident, $id:literal, $($attr:meta)?) => {
             $(#[$attr])?
-            #[async_std::test]
+            #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
                 let playlist = CLIENT.playlist(id).await?;
@@ -142,7 +142,7 @@ mod error {
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $error:ident) => {
-            #[async_std::test]
+            #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
                 assert_matches!(
@@ -159,7 +159,7 @@ mod error {
     define_test!(private, "PLCSusC_jlo16bxXlQLScDy4kgdLhhQP8A", NotFound);
     define_test!(deleted, "PLCSusC_jlo16qHzHLY6jmCWG_ov7R2hMv", NotFound);
 
-    #[async_std::test]
+    #[tokio::test]
     async fn video() -> Result<(), Box<dyn std::error::Error>> {
         let playlist = CLIENT
             .playlist("PLCSusC_jlo146Bv2QRvW7jvV0wZYiSf8N".parse()?)

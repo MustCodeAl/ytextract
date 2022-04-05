@@ -1,6 +1,6 @@
 use futures::StreamExt;
 
-#[async_std::main]
+#[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = ytextract::Client::new();
 

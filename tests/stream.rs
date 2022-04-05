@@ -5,7 +5,7 @@ static CLIENT: Lazy<ytextract::Client> = Lazy::new(ytextract::Client::new);
 macro_rules! define_test {
     ($fn:ident, $id:literal, $($attr:meta)?) => {
         $(#[$attr])?
-        #[async_std::test]
+        #[tokio::test]
         async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
             let id = $id.parse()?;
             let mut streams = CLIENT.streams(id).await?;
@@ -41,7 +41,7 @@ mod error {
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $error:ident) => {
-            #[async_std::test]
+            #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
                 assert_matches!(
@@ -64,7 +64,7 @@ mod error {
     define_test!(account_terminated, "Pfhpe6shO2U", AccountTerminated);
     define_test!(age_restricted, "SkRSXFQerZs", AgeRestricted);
 
-    #[async_std::test]
+    #[tokio::test]
     async fn copyright_claim() -> Result<(), Box<dyn std::error::Error>> {
         let id = "6MNavkSGntQ".parse()?;
 
