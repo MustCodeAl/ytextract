@@ -87,7 +87,7 @@ pub struct VideoPrimaryInfoRenderer {
 }
 
 impl VideoPrimaryInfoRenderer {
-    pub fn ratings(&self) -> Option<(u64, u64)> {
+    pub fn likes(&self) -> Option<u64> {
         // `like this video along with 4,457 other people` or `I like this`
         let label = &self
             .video_actions
@@ -106,10 +106,7 @@ impl VideoPrimaryInfoRenderer {
             .parse()
             .expect("Likes we not parsable as a unsigned integer");
 
-        // TODO: remove `ratings()` and replace it with `likes()` with v0.11.0
-        let dislikes = 0;
-
-        Some((likes, dislikes))
+        Some(likes)
     }
 
     pub fn hashtags(&self) -> impl Iterator<Item = &str> {

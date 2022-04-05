@@ -98,21 +98,15 @@ impl Video {
         self.player_response.video_details.view_count
     }
 
-    /// The [`Ratings`] a [`Video`] received.
-    pub fn ratings(&self) -> Ratings {
-        if let Some((likes, dislikes)) = self
-            .initial_data
+    /// The amount of likes a [`Video`] received.
+    pub fn likes(&self) -> Option<u64> {
+        self.initial_data
             .contents
             .two_column_watch_next_results
             .results
             .results
             .primary()
-            .ratings()
-        {
-            Ratings::Allowed { likes, dislikes }
-        } else {
-            Ratings::NotAllowed
-        }
+            .likes()
     }
 
     /// The hashtags a [`Video`] is tagged with.
@@ -219,7 +213,7 @@ impl std::fmt::Debug for Video {
             .field("channel", &self.channel())
             .field("description", &self.description())
             .field("views", &self.views())
-            .field("ratings", &self.ratings())
+            .field("likes", &self.likes())
             .field("live", &self.live())
             .field("thumbnails", &self.thumbnails())
             .field("date", &self.date())
@@ -289,21 +283,6 @@ impl<'a> PartialEq for Channel<'a> {
 }
 
 impl<'a> Eq for Channel<'a> {}
-
-/// Ratings on a video
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-pub enum Ratings {
-    /// Rating is allowed
-    Allowed {
-        /// The amount of likes a [`Video`] received
-        likes: u64,
-        /// The amount of dislikes a [`Video`] received
-        dislikes: u64,
-    },
-
-    /// Rating is not allowed
-    NotAllowed,
-}
 
 define_id! {
     11,
