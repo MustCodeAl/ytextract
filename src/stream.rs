@@ -29,7 +29,7 @@ pub(crate) async fn get(
     client: Client,
     id: crate::video::Id,
 ) -> crate::Result<impl Iterator<Item = Stream>> {
-    let player_response = client.api.streams(id).await?.into_std()?;
+    let player_response = client.api.streams(id).await?;
 
     // TODO: DashManifest/HlsManifest
     Ok(player_response

@@ -28,6 +28,15 @@ const CONTEXT_ANDROID: Context<'static> = Context {
     },
 };
 
+const CONTEXT_EMBEDDED: Context<'static> = Context {
+    client: Client {
+        hl: "en",
+        gl: "US",
+        client_name: "TVHTML5_SIMPLY_EMBEDDED_PLAYER",
+        client_version: "2.0",
+    },
+};
+
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Context<'a> {
@@ -145,7 +154,7 @@ impl Api {
     pub async fn streams(
         &self,
         id: crate::video::Id,
-    ) -> crate::Result<player_response::Result<player_response::StreamPlayerResponse>> {
+    ) -> crate::Result<player_response::StreamPlayerResponse> {
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Request {
@@ -153,8 +162,25 @@ impl Api {
         }
 
         let request = Request { video_id: id };
+        let res = self
+            .get("player", &request, CONTEXT_ANDROID)
+            .await
+            .and_then(
+                |x: player_response::Result<player_response::StreamPlayerResponse>| x.into_std(),
+            );
 
-        self.get("player", request, CONTEXT_ANDROID).await
+        // If this is a age-restricted error, retry with an embedded player
+        if let Err(Error::Youtube(crate::error::Youtube::AgeRestricted)) = res {
+            self.get("player", request, CONTEXT_EMBEDDED)
+                .await
+                .and_then(
+                    |x: player_response::Result<player_response::StreamPlayerResponse>| {
+                        x.into_std()
+                    },
+                )
+        } else {
+            res
+        }
     }
 
     pub async fn player(
