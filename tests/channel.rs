@@ -1,11 +1,9 @@
-use once_cell::sync::Lazy;
-
-static CLIENT: Lazy<ytextract::Client> = Lazy::new(ytextract::Client::new);
+use ytextract::Client;
 
 #[tokio::test]
 async fn get() -> Result<(), Box<dyn std::error::Error>> {
     let id = "UCdktGrgQlqxPsvHo6cHF0Ng".parse()?;
-    let channel = CLIENT.channel(id).await?;
+    let channel = Client::new().channel(id).await?;
 
     assert_eq!(channel.id(), id);
     assert_eq!(channel.name(), "Cooksie");
@@ -24,8 +22,8 @@ async fn get() -> Result<(), Box<dyn std::error::Error>> {
 #[tokio::test]
 async fn eq() -> Result<(), Box<dyn std::error::Error>> {
     let id = "UCdktGrgQlqxPsvHo6cHF0Ng".parse()?;
-    let channel1 = CLIENT.channel(id).await?;
-    let channel2 = CLIENT.channel(id).await?;
+    let channel1 = Client::new().channel(id).await?;
+    let channel2 = Client::new().channel(id).await?;
 
     assert_eq!(channel1, channel2);
 
@@ -33,7 +31,7 @@ async fn eq() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 mod metadata {
-    use super::CLIENT;
+    use ytextract::Client;
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $($attr:meta)?) => {
@@ -41,7 +39,7 @@ mod metadata {
             #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id: ytextract::channel::Id = $id.parse()?;
-                let channel = CLIENT.channel(id.clone()).await?;
+                let channel = Client::new().channel(id.clone()).await?;
                 assert_eq!(channel.id(), id);
                 Ok(())
             }
@@ -58,7 +56,7 @@ mod metadata {
 }
 
 mod uploads {
-    use super::CLIENT;
+    use ytextract::Client;
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $($attr:meta)?) => {
@@ -66,7 +64,7 @@ mod uploads {
             #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id: ytextract::channel::Id = $id.parse()?;
-                let playlist = CLIENT.playlist(id.uploads()).await?;
+                let playlist = Client::new().playlist(id.uploads()).await?;
                 assert_eq!(playlist.channel().expect("channel").id(), id);
                 Ok(())
             }
@@ -82,14 +80,14 @@ mod uploads {
 }
 
 mod badges {
-    use super::CLIENT;
+    use ytextract::Client;
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $badge:ident, $($attr:meta)?) => {
             $(#[$attr])?
             #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
-                let channel = CLIENT.channel($id.parse()?).await?;
+                let channel = Client::new().channel($id.parse()?).await?;
                 assert_eq!(channel.badges().next(), Some(ytextract::channel::Badge::$badge));
                 Ok(())
             }
@@ -105,15 +103,14 @@ mod badges {
 
 mod error {
     use assert_matches::assert_matches;
-
-    use super::CLIENT;
+    use ytextract::Client;
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $error:ident) => {
             #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
-                let channel = CLIENT.channel(id).await;
+                let channel = Client::new().channel(id).await;
                 assert_matches!(
                     channel,
                     Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error))
@@ -127,14 +124,14 @@ mod error {
 }
 
 mod subscribers {
-    use super::CLIENT;
+    use ytextract::Client;
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $subscribers:literal) => {
             #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
-                let channel = CLIENT.channel(id).await?;
+                let channel = Client::new().channel(id).await?;
                 assert!(channel.subscribers() >= Some($subscribers));
                 Ok(())
             }
@@ -144,7 +141,7 @@ mod subscribers {
     #[tokio::test]
     async fn zero() -> Result<(), Box<dyn std::error::Error>> {
         let id = "UCZqdX9k5eyv1aO7i2746bXg".parse()?;
-        let channel = CLIENT.channel(id).await?;
+        let channel = Client::new().channel(id).await?;
         assert_eq!(channel.subscribers(), None);
         Ok(())
     }
@@ -152,7 +149,7 @@ mod subscribers {
     #[tokio::test]
     async fn unviewable() -> Result<(), Box<dyn std::error::Error>> {
         let id = "UCgSJ92_7N3_TOHvKxN2yV1w".parse()?;
-        let channel = CLIENT.channel(id).await?;
+        let channel = Client::new().channel(id).await?;
         assert_eq!(channel.subscribers(), None);
         Ok(())
     }
