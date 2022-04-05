@@ -1,14 +1,12 @@
-use once_cell::sync::Lazy;
-
-static CLIENT: Lazy<ytextract::Client> = Lazy::new(ytextract::Client::new);
+use ytextract::Client;
 
 macro_rules! define_test {
     ($fn:ident, $id:literal, $($attr:meta)?) => {
         $(#[$attr])?
-        #[async_std::test]
+        #[tokio::test]
         async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
             let id = $id.parse()?;
-            let mut streams = CLIENT.streams(id).await?;
+            let mut streams = Client::new().streams(id).await?;
             assert!(streams.next().is_some());
             Ok(())
         }
@@ -28,7 +26,7 @@ define_test!(rating_disabled, "5VGm0dczmHc");
 define_test!(subtitles, "YltHGKX80Y8");
 
 mod embed_restricted {
-    use super::CLIENT;
+    use ytextract::Client;
 
     define_test!(youtube, "_kmeFXjjGfk");
     define_test!(author, "MeJVWBSsPAY");
@@ -36,16 +34,18 @@ mod embed_restricted {
 
 mod error {
     use assert_matches::assert_matches;
-
-    use super::CLIENT;
+    use ytextract::Client;
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $error:ident) => {
-            #[async_std::test]
+            #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
                 assert_matches!(
-                    CLIENT.streams(id).await.map(|x| x.collect::<Vec<_>>()),
+                    Client::new()
+                        .streams(id)
+                        .await
+                        .map(|x| x.collect::<Vec<_>>()),
                     Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error))
                 );
                 Ok(())
@@ -65,12 +65,12 @@ mod error {
     // Ignore for now
     //define_test!(age_restricted, "SkRSXFQerZs", AgeRestricted);
 
-    #[async_std::test]
+    #[tokio::test]
     async fn copyright_claim() -> Result<(), Box<dyn std::error::Error>> {
         let id = "6MNavkSGntQ".parse()?;
 
         assert_matches!(
-            CLIENT.streams(id).await.map(|x| x.collect::<Vec<_>>()),
+            Client::new().streams(id).await.map(|x| x.collect::<Vec<_>>()),
             Err(ytextract::Error::Youtube(ytextract::error::Youtube::CopyrightClaim {
                 claiment,
             })) if claiment == "Richard DiBacco"

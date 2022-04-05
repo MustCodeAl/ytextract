@@ -1,12 +1,10 @@
 use futures::StreamExt;
-use once_cell::sync::Lazy;
 use ytextract::video::Ratings;
+use ytextract::Client;
 
-static CLIENT: Lazy<ytextract::Client> = Lazy::new(ytextract::Client::new);
-
-#[async_std::test]
+#[tokio::test]
 async fn get() -> Result<(), Box<dyn std::error::Error>> {
-    let video = CLIENT
+    let video = Client::new()
         .video("https://www.youtube.com/watch?v=7B2PIVSWtJA".parse()?)
         .await?;
 
@@ -77,43 +75,43 @@ async fn get() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn eq() -> Result<(), Box<dyn std::error::Error>> {
-    let video1 = CLIENT.video("7B2PIVSWtJA".parse()?).await?;
-    let video2 = CLIENT.video("7B2PIVSWtJA".parse()?).await?;
+    let video1 = Client::new().video("7B2PIVSWtJA".parse()?).await?;
+    let video2 = Client::new().video("7B2PIVSWtJA".parse()?).await?;
 
     assert_eq!(video1, video2);
 
     Ok(())
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn eq_channel() -> Result<(), Box<dyn std::error::Error>> {
-    let video1 = CLIENT.video("7B2PIVSWtJA".parse()?).await?;
-    let video2 = CLIENT.video("7B2PIVSWtJA".parse()?).await?;
+    let video1 = Client::new().video("7B2PIVSWtJA".parse()?).await?;
+    let video2 = Client::new().video("7B2PIVSWtJA".parse()?).await?;
 
     assert_eq!(video1.channel(), video2.channel());
 
     Ok(())
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn ratings_not_allowed() -> Result<(), Box<dyn std::error::Error>> {
-    let video = CLIENT.video("9Jg_Fwc0QOY".parse()?).await?;
+    let video = Client::new().video("9Jg_Fwc0QOY".parse()?).await?;
     assert_eq!(video.ratings(), Ratings::NotAllowed);
 
     Ok(())
 }
 
 mod metadata {
-    use super::CLIENT;
+    use ytextract::Client;
 
     macro_rules! define_test {
         ($fn:ident, $id:literal) => {
-            #[async_std::test]
+            #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
-                let video = CLIENT.video(id).await?;
+                let video = Client::new().video(id).await?;
                 assert_eq!(video.id(), id);
                 Ok(())
             }
@@ -134,7 +132,7 @@ mod metadata {
     define_test!(premire, "vv-Fqm6Qtj4");
 
     mod embed_restricted {
-        use super::CLIENT;
+        use ytextract::Client;
 
         define_test!(youtube, "_kmeFXjjGfk");
         define_test!(author, "MeJVWBSsPAY");
@@ -144,16 +142,15 @@ mod metadata {
 
 mod error {
     use assert_matches::assert_matches;
-
-    use super::CLIENT;
+    use ytextract::Client;
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $error:ident) => {
-            #[async_std::test]
+            #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
                 let id = $id.parse()?;
                 assert_matches!(
-                    CLIENT.video(id).await,
+                    Client::new().video(id).await,
                     Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error))
                 );
                 Ok(())
@@ -181,12 +178,12 @@ mod error {
         CommunityGuidelineViolation
     );
 
-    #[async_std::test]
+    #[tokio::test]
     async fn copyright_claim() -> Result<(), Box<dyn std::error::Error>> {
         let id = "6MNavkSGntQ".parse()?;
 
         assert_matches!(
-            CLIENT.video(id).await,
+            Client::new().video(id).await,
             Err(ytextract::Error::Youtube(ytextract::error::Youtube::CopyrightClaim {
                 claiment,
             })) if claiment == "Richard DiBacco"
@@ -195,11 +192,11 @@ mod error {
     }
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn related() -> Result<(), Box<dyn std::error::Error>> {
     let id = "9bZkp7q19f0".parse()?;
 
-    let video = CLIENT.video(id).await?;
+    let video = Client::new().video(id).await?;
 
     video
         .related()

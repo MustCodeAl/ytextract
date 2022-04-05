@@ -1,11 +1,9 @@
 use futures::StreamExt;
-use once_cell::sync::Lazy;
+use ytextract::Client;
 
-static CLIENT: Lazy<ytextract::Client> = Lazy::new(ytextract::Client::new);
-
-#[async_std::test]
+#[tokio::test]
 async fn get() -> Result<(), Box<dyn std::error::Error>> {
-    let playlist = CLIENT
+    let playlist = Client::new()
         .playlist("PLCSusC_jlo14BH5hHnOh9b0O18HtGT3eP".parse()?)
         .await?;
 
@@ -28,12 +26,12 @@ async fn get() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn eq() -> Result<(), Box<dyn std::error::Error>> {
-    let playlist1 = CLIENT
+    let playlist1 = Client::new()
         .playlist("PLCSusC_jlo15M6x0Ot8gznM-QA8CriNk4".parse()?)
         .await?;
-    let playlist2 = CLIENT
+    let playlist2 = Client::new()
         .playlist("PLCSusC_jlo15M6x0Ot8gznM-QA8CriNk4".parse()?)
         .await?;
 
@@ -42,9 +40,9 @@ async fn eq() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn eq_channel() -> Result<(), Box<dyn std::error::Error>> {
-    let playlist = CLIENT
+    let playlist = Client::new()
         .playlist("PLCSusC_jlo15M6x0Ot8gznM-QA8CriNk4".parse()?)
         .await?;
 
@@ -53,9 +51,9 @@ async fn eq_channel() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[async_std::test]
+#[tokio::test]
 async fn video() -> Result<(), Box<dyn std::error::Error>> {
-    let playlist = CLIENT
+    let playlist = Client::new()
         .playlist("PLCSusC_jlo14F22jss8ZtDLbpmRQIVLzr".parse()?)
         .await?;
 
@@ -81,15 +79,16 @@ async fn video() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 mod metadata {
-    use super::CLIENT;
+    use ytextract::Client;
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $($attr:meta)?) => {
             $(#[$attr])?
-            #[async_std::test]
+            #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
+                let client = Client::new();
                 let id: ytextract::playlist::Id = $id.parse()?;
-                let playlist = CLIENT.playlist(id.clone()).await?;
+                let playlist = client.playlist(id.clone()).await?;
                 assert_eq!(playlist.id(), id);
                 Ok(())
             }
@@ -105,16 +104,17 @@ mod metadata {
 }
 
 mod videos {
-    use super::CLIENT;
     use futures::stream::StreamExt;
+    use ytextract::Client;
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $($attr:meta)?) => {
             $(#[$attr])?
-            #[async_std::test]
+            #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
+                let client = Client::new();
                 let id = $id.parse()?;
-                let playlist = CLIENT.playlist(id).await?;
+                let playlist = client.playlist(id).await?;
                 let videos = playlist.videos();
                 futures::pin_mut!(videos);
                 assert!(videos.next().await.is_some());
@@ -137,16 +137,16 @@ mod videos {
 mod error {
     use assert_matches::assert_matches;
     use futures::StreamExt;
-
-    use super::CLIENT;
+    use ytextract::Client;
 
     macro_rules! define_test {
         ($fn:ident, $id:literal, $error:ident) => {
-            #[async_std::test]
+            #[tokio::test]
             async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
+                let client = Client::new();
                 let id = $id.parse()?;
                 assert_matches!(
-                    CLIENT.playlist(id).await,
+                    client.playlist(id).await,
                     Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error))
                 );
                 Ok(())
@@ -159,9 +159,9 @@ mod error {
     define_test!(private, "PLCSusC_jlo16bxXlQLScDy4kgdLhhQP8A", NotFound);
     define_test!(deleted, "PLCSusC_jlo16qHzHLY6jmCWG_ov7R2hMv", NotFound);
 
-    #[async_std::test]
+    #[tokio::test]
     async fn video() -> Result<(), Box<dyn std::error::Error>> {
-        let playlist = CLIENT
+        let playlist = Client::new()
             .playlist("PLCSusC_jlo146Bv2QRvW7jvV0wZYiSf8N".parse()?)
             .await?;
         use ytextract::playlist::video::UnavailabilityReason;
