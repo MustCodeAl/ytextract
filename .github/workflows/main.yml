@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup | Checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - name: Setup | Rust
         uses: actions-rs/toolchain@v1.0.7
         with:
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup | Checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - name: Setup | Rust
         uses: actions-rs/toolchain@v1.0.7
         with:
@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup | Checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - name: Setup | Rust
         uses: actions-rs/toolchain@v1.0.7
         with:
@@ -71,7 +71,7 @@ jobs:
         os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
       - name: Setup | Checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - name: Setup | Rust
         uses: actions-rs/toolchain@v1.0.7
         with:
