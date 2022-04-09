@@ -56,14 +56,7 @@ mod error {
     define_test!(not_found, "L_VmQZtLVID", NotFound);
     define_test!(private, "ZGdLIwrGHG8", Private);
     define_test!(required_purchase, "p3dDcKOFXQg", PurchaseRequired);
-    define_test!(
-        nudity_or_sexual,
-        "-JVFs5w9V0U",
-        NudityOrSexualContentViolation
-    );
     define_test!(account_terminated, "Pfhpe6shO2U", AccountTerminated);
-    // Ignore for now
-    //define_test!(age_restricted, "SkRSXFQerZs", AgeRestricted);
 
     #[tokio::test]
     async fn copyright_claim() -> Result<(), Box<dyn std::error::Error>> {

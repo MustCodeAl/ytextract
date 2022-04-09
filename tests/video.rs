@@ -150,11 +150,6 @@ mod error {
 
     define_test!(not_found, "L_VmQZtLVID", NotFound);
     define_test!(private, "ZGdLIwrGHG8", Private);
-    define_test!(
-        nudity_or_sexual,
-        "-JVFs5w9V0U",
-        NudityOrSexualContentViolation
-    );
     define_test!(account_terminated, "Pfhpe6shO2U", AccountTerminated);
     define_test!(account_terminated2, "PjwLWLgMeBw", AccountTerminated);
     define_test!(removed_by_uploader, "fjiUqb2SSw0", RemovedByUploader);
