@@ -152,9 +152,7 @@ mod error {
     define_test!(private, "ZGdLIwrGHG8", Private);
     define_test!(account_terminated, "Pfhpe6shO2U", AccountTerminated);
     define_test!(account_terminated2, "PjwLWLgMeBw", AccountTerminated);
-    define_test!(removed_by_uploader, "fjiUqb2SSw0", RemovedByUploader);
     define_test!(geo_restricted, "7xHqXGY4xKs", GeoRestricted);
-    define_test!(account_deleted, "9GhIacgO6-s", AccountDeleted);
     define_test!(privacy_claim, "DESqNHJ-28k", PrivacyClaim);
     define_test!(tos_violation, "4270c5qWPBg", TermsOfServiceViolation);
     define_test!(
@@ -162,6 +160,9 @@ mod error {
         "M78rlxEMBxk",
         CommunityGuidelineViolation
     );
+    // Video IDs expired and returned to not being allocated
+    // define_test!(removed_by_uploader, "fjiUqb2SSw0", RemovedByUploader);
+    // define_test!(account_deleted, "9GhIacgO6-s", AccountDeleted);
 
     #[tokio::test]
     async fn copyright_claim() -> Result<(), Box<dyn std::error::Error>> {
