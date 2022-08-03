@@ -146,14 +146,6 @@ mod subscribers {
         Ok(())
     }
 
-    #[tokio::test]
-    async fn unviewable() -> Result<(), Box<dyn std::error::Error>> {
-        let id = "UCgSJ92_7N3_TOHvKxN2yV1w".parse()?;
-        let channel = Client::new().channel(id).await?;
-        assert_eq!(channel.subscribers(), None);
-        Ok(())
-    }
-
     define_test!(hundred, "UC-L5xxQzDhx99_g51h-g-tg", 100);
 
     define_test!(thousand, "UCxS98ISZNcuaJRCvy6JV6Fw", 1_000);
