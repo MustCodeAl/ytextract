@@ -243,8 +243,8 @@ pub enum RelatedItem {
     CompactRadioRenderer(CompactRadioRenderer),
     CompactMovieRenderer(CompactMovieRenderer),
     ContinuationItemRenderer(ContinuationItemRenderer),
-    PromotedSparklesWebRenderer {},
-    CompactPromotedVideoRenderer {},
+    #[serde(other)]
+    Other,
 }
 
 #[derive(Clone, Deserialize)]

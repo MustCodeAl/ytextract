@@ -191,7 +191,7 @@ impl Video {
                         yield Related::Movie(related::Movie(movie, client.clone()));
                     },
                     // I don't know what this is - just skip it
-                    next::RelatedItem::PromotedSparklesWebRenderer {} | next::RelatedItem::CompactPromotedVideoRenderer {} => continue,
+                    next::RelatedItem::Other => continue,
                 }
             }
         })
