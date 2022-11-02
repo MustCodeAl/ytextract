@@ -170,7 +170,7 @@ impl Api {
             );
 
         // If this is a age-restricted error, retry with an embedded player
-        if let Err(Error::Youtube(crate::error::Youtube::AgeRestricted)) = res {
+        if matches!(res, Err(crate::Error::Youtube(ref yt)) if yt.to_string().contains("age")) {
             self.get("player", request, CONTEXT_EMBEDDED)
                 .await
                 .and_then(

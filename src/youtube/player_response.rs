@@ -1,6 +1,5 @@
 use std::time::Duration;
 
-use crate::error::Youtube;
 use reqwest::Url;
 use serde::Deserialize;
 
@@ -19,9 +18,9 @@ pub enum Result<T> {
 impl<T> Result<T> {
     pub fn into_std(self) -> crate::Result<T> {
         match self {
-            Self::Error { playability_status } => {
-                Err(crate::Error::Youtube(playability_status.as_error()))
-            }
+            Self::Error { playability_status } => Err(crate::Error::Youtube(
+                crate::error::Youtube(playability_status.reason),
+            )),
             Self::Ok(ok) => Ok(ok),
         }
     }
@@ -124,46 +123,4 @@ pub struct AudioFormat {
 #[serde(rename_all = "camelCase")]
 pub struct PlayabilityStatus {
     pub reason: String,
-}
-
-impl PlayabilityStatus {
-    fn as_error(&self) -> crate::error::Youtube {
-        match self.reason.as_str() {
-            "This video is unavailable" => Youtube::NotFound,
-            "This video is no longer available because the YouTube account associated with this video has been terminated." => Youtube::AccountTerminated,
-            "The YouTube account associated with this video has been terminated due to multiple third-party notifications of copyright infringement." => Youtube::AccountTerminated,
-            "This video has been removed by the uploader" => Youtube::RemovedByUploader,
-            "This video has been removed for violating YouTube's policy on nudity or sexual content" => Youtube::NudityOrSexualContentViolation,
-            "This video is private" => Youtube::Private,
-            "This video has been removed for violating YouTube's Terms of Service." => Youtube::TermsOfServiceViolation,
-            "This video has been removed for violating YouTube's Terms of Service" => Youtube::TermsOfServiceViolation,
-            "This video has been removed for violating YouTube's Community Guidelines" => Youtube::CommunityGuidelineViolation,
-            "This video is no longer available due to a privacy claim by a third party" => Youtube::PrivacyClaim,
-            "This video requires payment to watch." => Youtube::PurchaseRequired,
-            "This video may be inappropriate for some users." => Youtube::AgeRestricted,
-            "This video is not available in your country" => Youtube::GeoRestricted,
-            "This video is no longer available because the uploader has closed their YouTube account." => Youtube::AccountDeleted,
-            copyright if copyright.starts_with("This video is no longer available due to a copyright claim by") => {
-                let who = copyright
-                    .strip_prefix("This video is no longer available due to a copyright claim by ")
-                    .unwrap();
-
-                Youtube::CopyrightClaim {
-                    claiment: who.to_string()
-                }
-            }
-            copyright if copyright.starts_with("This video contains content from ") => {
-                let who = copyright
-                    .strip_prefix("This video contains content from ")
-                    .unwrap()
-                    .strip_suffix(", who has blocked it in your country on copyright grounds.")
-                    .unwrap();
-
-                Youtube::CopyrightClaim {
-                    claiment: who.to_string()
-                }
-            }
-            unknown => unimplemented!("Unknown error reason: `{}`", unknown),
-        }
-    }
 }

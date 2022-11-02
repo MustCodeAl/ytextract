@@ -17,15 +17,9 @@ impl<T> Result<T> {
             Self::Error { alerts } => {
                 assert_eq!(alerts.0.alert_renderer.r#type, "ERROR");
 
-                match alerts.0.alert_renderer.text() {
-                    "The playlist does not exist." | "This channel does not exist." => {
-                        Err(crate::Error::Youtube(crate::error::Youtube::NotFound))
-                    }
-                    "This playlist type is unviewable." => {
-                        Err(crate::Error::Youtube(crate::error::Youtube::Unviewable))
-                    }
-                    e => unimplemented!("Unknown Error text: '{}'", e),
-                }
+                Err(crate::Error::Youtube(crate::error::Youtube(
+                    alerts.0.alert_renderer.text(),
+                )))
             }
             Self::Ok(ok) => Ok(ok),
         }
@@ -45,10 +39,10 @@ pub struct AlertRenderer {
 }
 
 impl AlertRenderer {
-    fn text(&self) -> &str {
-        match &self.text {
-            Text::SimpleText(simple_text) => simple_text.simple_text.as_str(),
-            Text::Runs(runs) => runs.runs[0].text.as_str(),
+    fn text(self) -> String {
+        match self.text {
+            Text::SimpleText(simple_text) => simple_text.simple_text,
+            Text::Runs(mut runs) => runs.runs.swap_remove(0).text,
         }
     }
 }
