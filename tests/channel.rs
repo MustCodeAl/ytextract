@@ -101,28 +101,6 @@ mod badges {
     define_test!(verified, "UCDxS8VeAQhnHJc6B5jE3KHg", Verified);
 }
 
-mod error {
-    use assert_matches::assert_matches;
-    use ytextract::Client;
-
-    macro_rules! define_test {
-        ($fn:ident, $id:literal, $error:ident) => {
-            #[tokio::test]
-            async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
-                let id = $id.parse()?;
-                let channel = Client::new().channel(id).await;
-                assert_matches!(
-                    channel,
-                    Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error))
-                );
-                Ok(())
-            }
-        };
-    }
-
-    define_test!(not_found, "UC5CwaMl1eIgY8h02uZw7u8F", NotFound);
-}
-
 mod subscribers {
     use ytextract::Client;
 

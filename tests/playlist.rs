@@ -135,29 +135,8 @@ mod videos {
 }
 
 mod error {
-    use assert_matches::assert_matches;
     use futures::StreamExt;
     use ytextract::Client;
-
-    macro_rules! define_test {
-        ($fn:ident, $id:literal, $error:ident) => {
-            #[tokio::test]
-            async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
-                let client = Client::new();
-                let id = $id.parse()?;
-                assert_matches!(
-                    client.playlist(id).await,
-                    Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error))
-                );
-                Ok(())
-            }
-        };
-    }
-
-    define_test!(not_found, "PLI5YfMzCfRtZ8eV576YoY3vIYrHjyVm_F", NotFound);
-    define_test!(unviewable, "RDGMEMQ1dJ7wXfLlqCjwV0xfSNbA", Unviewable);
-    define_test!(private, "PLCSusC_jlo16bxXlQLScDy4kgdLhhQP8A", NotFound);
-    define_test!(deleted, "PLCSusC_jlo16qHzHLY6jmCWG_ov7R2hMv", NotFound);
 
     #[tokio::test]
     async fn video() -> Result<(), Box<dyn std::error::Error>> {

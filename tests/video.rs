@@ -130,54 +130,6 @@ mod metadata {
     }
 }
 
-mod error {
-    use assert_matches::assert_matches;
-    use ytextract::Client;
-
-    macro_rules! define_test {
-        ($fn:ident, $id:literal, $error:ident) => {
-            #[tokio::test]
-            async fn $fn() -> Result<(), Box<dyn std::error::Error>> {
-                let id = $id.parse()?;
-                assert_matches!(
-                    Client::new().video(id).await,
-                    Err(ytextract::Error::Youtube(ytextract::error::Youtube::$error))
-                );
-                Ok(())
-            }
-        };
-    }
-
-    define_test!(not_found, "L_VmQZtLVID", NotFound);
-    define_test!(private, "ZGdLIwrGHG8", Private);
-    define_test!(account_terminated, "Pfhpe6shO2U", AccountTerminated);
-    define_test!(account_terminated2, "PjwLWLgMeBw", AccountTerminated);
-    define_test!(geo_restricted, "7xHqXGY4xKs", GeoRestricted);
-    define_test!(privacy_claim, "DESqNHJ-28k", PrivacyClaim);
-    define_test!(tos_violation, "4270c5qWPBg", TermsOfServiceViolation);
-    define_test!(
-        community_guideline_violation,
-        "M78rlxEMBxk",
-        CommunityGuidelineViolation
-    );
-    // Video IDs expired and returned to not being allocated
-    // define_test!(removed_by_uploader, "fjiUqb2SSw0", RemovedByUploader);
-    // define_test!(account_deleted, "9GhIacgO6-s", AccountDeleted);
-
-    #[tokio::test]
-    async fn copyright_claim() -> Result<(), Box<dyn std::error::Error>> {
-        let id = "6MNavkSGntQ".parse()?;
-
-        assert_matches!(
-            Client::new().video(id).await,
-            Err(ytextract::Error::Youtube(ytextract::error::Youtube::CopyrightClaim {
-                claiment,
-            })) if claiment == "Richard DiBacco"
-        );
-        Ok(())
-    }
-}
-
 #[tokio::test]
 async fn related() -> Result<(), Box<dyn std::error::Error>> {
     let id = "9bZkp7q19f0".parse()?;
