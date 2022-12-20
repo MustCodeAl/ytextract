@@ -98,7 +98,7 @@ mod badges {
     }
 
     define_test!(artist, "UCiGm_E4ZwYSHV3bcW1pnSeQ", VerifiedArtist);
-    define_test!(verified, "UCDxS8VeAQhnHJc6B5jE3KHg", Verified);
+    define_test!(verified, "UCXuqSBlHAE6Xw-yeJA0Tunw", Verified);
 }
 
 mod subscribers {
