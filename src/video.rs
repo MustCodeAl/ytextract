@@ -133,8 +133,7 @@ impl Video {
 
     /// The date a [`Video`] was published.
     pub fn date(&self) -> chrono::NaiveDate {
-        self
-            .initial_data
+        self.initial_data
             .contents
             .two_column_watch_next_results
             .results
@@ -152,17 +151,16 @@ impl Video {
             .secondary_results
             .as_ref()?
             .secondary_results
-            .results
-            .clone();
+            .items()?;
         let client = self.client.clone();
 
         Some(async_stream::stream! {
-            let mut items: Box<dyn Iterator<Item = next::RelatedItem> + Send + Sync> =
-                Box::new(initial_items.into_iter());
+            let mut items: Box<dyn Iterator<Item = next::SectionItem> + Send + Sync> =
+                Box::new(initial_items);
 
             while let Some(item) = items.next() {
                 match item {
-                    next::RelatedItem::ContinuationItemRenderer(continuation) => {
+                    next::SectionItem::ContinuationItemRenderer(continuation) => {
                         assert!(
                             items.next().is_none(),
                             "Found a continuation in the middle of items!"
@@ -175,20 +173,20 @@ impl Video {
 
                         items = Box::new(response.into_videos());
                     }
-                    next::RelatedItem::CompactVideoRenderer(video) => {
+                    next::SectionItem::CompactVideoRenderer(video) => {
                         yield Related::Video(related::Video(video, client.clone()));
                     }
-                    next::RelatedItem::CompactPlaylistRenderer(playlist) => {
+                    next::SectionItem::CompactPlaylistRenderer(playlist) => {
                         yield Related::Playlist(related::Playlist(playlist, client.clone()));
                     }
-                    next::RelatedItem::CompactRadioRenderer(radio) => {
+                    next::SectionItem::CompactRadioRenderer(radio) => {
                         yield Related::Radio(related::Radio(radio, client.clone()));
                     }
-                    next::RelatedItem::CompactMovieRenderer(movie) => {
+                    next::SectionItem::CompactMovieRenderer(movie) => {
                         yield Related::Movie(related::Movie(movie, client.clone()));
                     },
                     // I don't know what this is - just skip it
-                    next::RelatedItem::Other => continue,
+                    next::SectionItem::Other => continue,
                 }
             }
         })

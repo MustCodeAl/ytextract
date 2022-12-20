@@ -38,9 +38,9 @@ pub struct BrowseEndpoint {
 
 #[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase", untagged)]
-pub enum Text {
-    SimpleText(SimpleText),
-    Runs(TitleRuns),
+pub enum Text<ST = SimpleText, R = TitleRuns> {
+    SimpleText(ST),
+    Runs(R),
 }
 
 #[derive(Deserialize, Clone, Default)]

@@ -123,11 +123,8 @@ impl Playlist {
     /// The [`Channel`] that uploaded this playlist.
     pub fn channel(&self) -> Channel<'_> {
         Channel {
-            id: self.0.short_byline_text.runs[0]
-                .navigation_endpoint
-                .clone()
-                .map(|x| x.browse_endpoint.browse_id),
-            name: &self.0.short_byline_text.runs[0].text,
+            id: self.0.channel_id(),
+            name: &self.0.channel_name(),
             badges: &self.0.owner_badges,
             client: &self.1,
         }
