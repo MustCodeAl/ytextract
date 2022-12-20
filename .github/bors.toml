@@ -1,9 +1,0 @@
-status = [
-    "Check",
-    "Documentation",
-    "Format",
-    "Test (ubuntu-latest)",
-    "Test (macOS-latest)",
-    "Test (windows-latest)",
-]
-delete_merged_branches = true

@@ -75,8 +75,8 @@ pub enum Content {
     VideoPrimaryInfoRenderer(VideoPrimaryInfoRenderer),
     VideoSecondaryInfoRenderer(VideoSecondaryInfoRenderer),
     ItemSectionRenderer(ItemSectionRenderer),
-    MerchandiseShelfRenderer {},
-    TicketShelfRenderer {},
+    #[serde(other)]
+    Other,
 }
 
 #[derive(Clone, Deserialize)]
@@ -240,15 +240,50 @@ pub struct SecondaryResults {
 }
 
 #[derive(Clone, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SecondaryResults2 {
-    #[serde(default)]
-    pub results: Vec<RelatedItem>,
+#[serde(rename_all = "camelCase", untagged)]
+pub enum SecondaryResults2 {
+    WithChips {
+        #[serde(default)]
+        results: Vec<SecondaryResultsItem>,
+    },
+    WithoutChips {
+        #[serde(default)]
+        results: Vec<SectionItem>,
+    },
+}
+
+impl SecondaryResults2 {
+    pub fn items(&self) -> Option<impl Iterator<Item = SectionItem>> {
+        match self {
+            SecondaryResults2::WithChips { results } => results.iter().find_map(|x| match x {
+                SecondaryResultsItem::ItemSectionRenderer(r) => {
+                    Some(r.contents.clone().into_iter())
+                }
+                SecondaryResultsItem::Other => None,
+            }),
+            SecondaryResults2::WithoutChips { results } => Some(results.clone().into_iter()),
+        }
+    }
 }
 
 #[derive(Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub enum RelatedItem {
+pub enum SecondaryResultsItem {
+    ItemSectionRenderer(SecondaryItemSectionRenderer),
+    #[serde(other)]
+    Other,
+}
+
+#[derive(Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SecondaryItemSectionRenderer {
+    #[serde(default)]
+    pub contents: Vec<SectionItem>,
+}
+
+#[derive(Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum SectionItem {
     CompactVideoRenderer(CompactVideoRenderer),
     CompactPlaylistRenderer(CompactPlaylistRenderer),
     CompactRadioRenderer(CompactRadioRenderer),
@@ -280,12 +315,31 @@ pub struct CompactPlaylistRenderer {
     pub thumbnail: Thumbnails,
     pub title: SimpleText,
     // channel name
-    pub short_byline_text: super::Runs<OptionalChannelNameRun>,
+    pub short_byline_text: Text<SimpleText, super::Runs<OptionalChannelNameRun>>,
     // length
     pub video_count_short_text: SimpleText,
 
     #[serde(default)]
     pub owner_badges: Vec<Badge>,
+}
+
+impl CompactPlaylistRenderer {
+    pub fn channel_name(&self) -> &str {
+        match &self.short_byline_text {
+            Text::SimpleText(s) => &s.simple_text,
+            Text::Runs(r) => &r.runs[0].text,
+        }
+    }
+
+    pub fn channel_id(&self) -> Option<crate::channel::Id> {
+        match &self.short_byline_text {
+            Text::SimpleText(_) => None,
+            Text::Runs(r) => r.runs[0]
+                .navigation_endpoint
+                .clone()
+                .map(|x| x.browse_endpoint.browse_id),
+        }
+    }
 }
 
 #[derive(Clone, Deserialize)]
@@ -315,30 +369,30 @@ pub struct OptionalChannelNameRun {
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Continuation {
-    pub on_response_received_endpoints: Option<(OnResponseReceivedAction,)>,
+    pub on_response_received_endpoints: Vec<OnResponseReceivedEndpoint>,
 }
 
 impl Continuation {
-    pub fn into_videos(self) -> impl Iterator<Item = RelatedItem> {
-        if let Some(end) = self.on_response_received_endpoints {
-            end.0
-                .append_continuation_items_action
-                .continuation_items
-                .into_iter()
-        } else {
-            vec![].into_iter()
-        }
+    pub fn into_videos(self) -> impl Iterator<Item = SectionItem> {
+        self.on_response_received_endpoints
+            .into_iter()
+            .find_map(|x| {
+                x.append_continuation_items_action
+                    .map(|x| x.continuation_items.into_iter())
+            })
+            .unwrap_or_else(|| vec![].into_iter())
     }
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct OnResponseReceivedAction {
-    pub append_continuation_items_action: AppendContinuationItemsAction,
+pub struct OnResponseReceivedEndpoint {
+    #[serde(default)]
+    pub append_continuation_items_action: Option<AppendContinuationItemsAction>,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AppendContinuationItemsAction {
-    pub continuation_items: Vec<RelatedItem>,
+    pub continuation_items: Vec<SectionItem>,
 }
