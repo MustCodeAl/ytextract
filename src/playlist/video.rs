@@ -34,6 +34,11 @@ pub struct Error {
 }
 
 /// A Video of a [`Playlist`](super::Playlist).
+///
+/// # Note
+///
+/// If more information about this video is required, use the
+/// [`Video::upgrade`](Video::upgrade) method.
 #[derive(Clone)]
 pub struct Video {
     client: Client,
