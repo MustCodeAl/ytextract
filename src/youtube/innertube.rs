@@ -7,6 +7,7 @@ use crate::{youtube::player_response, Error};
 const RETRYS: u32 = 5;
 const TIMEOUT: Duration = Duration::from_secs(30);
 const DUMP: bool = option_env!("YTEXTRACT_DUMP").is_some();
+const DUMP_ERR: bool = option_env!("YTEXTRACT_DUMP_ERR").is_some();
 const BASE_URL: &str = "https://youtubei.googleapis.com/youtubei/v1";
 const API_KEY: &str = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
 
@@ -126,11 +127,11 @@ impl Api {
                 Ok(res) => {
                     let response = res.await?;
 
-                    if DUMP {
+                    let res = serde_json::from_str::<T>(&response);
+                    if DUMP || (DUMP_ERR && res.is_err()) {
                         dump(endpoint, &response)
                     }
-
-                    let res = serde_json::from_str::<T>(&response).expect("Failed to parse JSON");
+                    let res = res.expect("Failed to parse JSON");
                     break Ok(res);
                 }
                 Err(err) => {
