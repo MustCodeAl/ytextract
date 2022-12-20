@@ -23,7 +23,7 @@
 pub mod related;
 
 use crate::{
-    youtube::{innertube::Next, next, parse_date, player_response::PlayerResponse},
+    youtube::{innertube::Next, next, player_response::PlayerResponse},
     Client, Stream, Thumbnail,
 };
 
@@ -133,17 +133,14 @@ impl Video {
 
     /// The date a [`Video`] was published.
     pub fn date(&self) -> chrono::NaiveDate {
-        parse_date(
-            &self
-                .initial_data
-                .contents
-                .two_column_watch_next_results
-                .results
-                .results
-                .primary()
-                .date_text,
-        )
-        .expect("Unable to parse date")
+        self
+            .initial_data
+            .contents
+            .two_column_watch_next_results
+            .results
+            .results
+            .primary()
+            .date()
     }
 
     /// The [`Items`](Related) related to a [`Video`].

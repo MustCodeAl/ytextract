@@ -1,6 +1,8 @@
+use std::ops::Deref;
+
 use super::{
-    parse_subscribers, Badge, ChannelNameRuns, ContinuationItemRenderer, SimpleText, Text,
-    Thumbnails, TitleRun,
+    parse_date, parse_subscribers, Badge, ChannelNameRuns, ContinuationItemRenderer, SimpleText,
+    Text, Thumbnails, TitleRun,
 };
 use serde::Deserialize;
 
@@ -87,6 +89,15 @@ pub struct VideoPrimaryInfoRenderer {
 }
 
 impl VideoPrimaryInfoRenderer {
+    pub fn date(&self) -> chrono::NaiveDate {
+        let date_str = self
+            .date_text
+            .deref()
+            .trim_start_matches("Streamed live on ");
+
+        parse_date(date_str).expect("Unable to parse date")
+    }
+
     pub fn likes(&self) -> Option<u64> {
         // `like this video along with 4,457 other people` or `I like this`
         let label = &self
