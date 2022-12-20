@@ -78,7 +78,9 @@ jobs:
           toolchain: stable
           override: true
           profile: minimal
+      - name: Install nextest
+        uses: taiki-e/install-action@nextest
       - name: Setup | Cache
         uses: Swatinem/rust-cache@v2
       - name: Build | Test
-        run: cargo test --all-features
+        run: cargo nextest run --profile ci --all-features
