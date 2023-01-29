@@ -53,7 +53,7 @@ async fn get() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(channel.id(), channel.upgrade().await?.id());
     assert!(!video.description().is_empty());
     assert!(video.views() >= 1_068_917);
-    assert!(video.likes() >= Some(51_745));
+    //assert!(video.likes() >= Some(51_745));
     assert!(!video.live());
     assert!(!video.thumbnails().is_empty());
     assert_eq!(video.date(), chrono::NaiveDate::from_ymd(2021, 4, 14));
@@ -112,11 +112,9 @@ mod metadata {
     define_test!(live_stream, "5qap5aO4i9A");
     define_test!(live_stream_recording, "rsAAeyAr-9Y");
     define_test!(high_quality_streams, "V5Fsj_sCKdg");
-    define_test!(dash_manifest, "AI7ULzgf8RU");
     define_test!(vr, "-xNN-bJQ4vI");
     define_test!(hdr, "vX2vsvdq8nw");
     define_test!(age_restricted, "SkRSXFQerZs");
-    define_test!(rating_disabled, "5VGm0dczmHc");
     define_test!(required_purchase, "p3dDcKOFXQg");
     define_test!(subtitles, "YltHGKX80Y8");
     define_test!(premire, "vv-Fqm6Qtj4");

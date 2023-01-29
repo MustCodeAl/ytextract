@@ -142,6 +142,7 @@ impl MenuRenderer {
             TopLevelButton::ToggleButtonRenderer(ref button) => Some(button),
             TopLevelButton::ButtonRenderer {} => None,
             TopLevelButton::DownloadButtonRenderer {} => None,
+            TopLevelButton::SegmentedLikeDislikeButtonRenderer {} => None,
         })
     }
 }
@@ -152,6 +153,7 @@ pub enum TopLevelButton {
     ToggleButtonRenderer(ToggleButtonRenderer),
     DownloadButtonRenderer {},
     ButtonRenderer {},
+    SegmentedLikeDislikeButtonRenderer {},
 }
 
 #[derive(Clone, Deserialize, Default)]
