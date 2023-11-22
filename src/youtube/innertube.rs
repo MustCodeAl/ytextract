@@ -1,7 +1,8 @@
 use std::time::Duration;
 
 use serde::Serialize;
-
+use env;
+use base64::engine::general_purpose;
 use crate::{youtube::player_response, Error};
 
 const RETRYS: u32 = 5;
@@ -9,6 +10,8 @@ const TIMEOUT: Duration = Duration::from_secs(30);
 const DUMP: bool = option_env!("YTEXTRACT_DUMP").is_some();
 const DUMP_ERR: bool = option_env!("YTEXTRACT_DUMP_ERR").is_some();
 const BASE_URL: &str = "https://youtubei.googleapis.com/youtubei/v1";
+
+//https://developers.google.com/youtube/v3/getting-started
 const API_KEY: &str = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
 
 const CONTEXT_WEB: Context<'static> = Context {
@@ -86,7 +89,7 @@ fn dump(endpoint: &'static str, response: &str) {
         &format!("{}/{}.json", endpoint, time.as_millis()),
         &response,
     )
-    .expect("Write");
+        .expect("Write");
 }
 
 impl Api {
@@ -105,10 +108,33 @@ impl Api {
 
         let request = Request { context, request };
 
+
+        // self.http.
+
+
+        let env_api_key = std::env::var("API_KEY");
+        let mut g_api_key: &str = "";
+
+
+        match env_api_key.as_ref() {
+            Ok(key) => {
+                // key.
+
+                g_api_key = key.as_str();
+            }
+            Err(e) => {
+                eprintln!("Error: not value found for api key {:?}", e);
+                g_api_key = API_KEY;
+            }
+        }
+
+        let g_api_key: &str = g_api_key;
+
+
         let request = self
             .http
             .post(format!("{}/{}", BASE_URL, endpoint))
-            .header("X-Goog-Api-Key", API_KEY)
+            .header("X-Goog-Api-Key", g_api_key)
             .json(&request)
             .timeout(TIMEOUT);
 
@@ -196,6 +222,7 @@ impl Api {
 
         let request = Request { video_id: id };
 
+        // try to switch the context to ios or desktop
         self.get("player", request, CONTEXT_ANDROID).await
     }
 
@@ -234,16 +261,17 @@ impl Api {
             #[serde(skip_serializing_if = "Option::is_none")]
             params: Option<String>,
         }
+        use base64::{Engine as _, engine::general_purpose};
 
         let request = match browse {
             Browse::Playlist(id) => Request {
                 browse_id: format!("VL{}", id),
-                params: Some(base64::encode([0xc2, 0x06, 0x02, 0x08, 0x00])),
+                params: Some(general_purpose::STANDARD_NO_PAD.encode([0xc2, 0x06, 0x02, 0x08, 0x00])),
             },
             Browse::Channel { id, page } => Request {
                 browse_id: format!("{}", id),
                 params: match page {
-                    ChannelPage::About => Some(base64::encode(b"\x12\x05about")),
+                    ChannelPage::About => Some(general_purpose::STANDARD_NO_PAD.encode(b"\x12\x05about")),
                 },
             },
             Browse::Continuation(continuation) => {
